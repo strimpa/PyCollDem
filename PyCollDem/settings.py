@@ -22,11 +22,15 @@ SECRET_KEY = '29ykgydlrxx=x6g3^u%^rvg)gmf*m3x1vi9vv87z#c$l91r1&t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'CollDem.CollDemUser'
+
 TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = (
 	os.path.join(BASE_DIR, 'CollDem', 'templates'),
 )
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ALLOWED_HOSTS = []
 
