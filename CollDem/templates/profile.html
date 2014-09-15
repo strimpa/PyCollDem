@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+{% if not user_controller.valid_user %}
+	<div>No user has been found for the user ID or username given.</div>
+{% else %}
+	<p><H1>Public profile of {{ user_controller.the_user.username }}</H1></p>
+	<div id="userProfile" class="contentBorder contentField innerContentBorder">
+		<table>
+		<tr>
+		<td>User ID:</td><td>{{ user_controller.the_user.guid }}</td>
+		</tr>
+		<tr>
+		<td>Avatar image:</td><td><img src="{{ user_controller.get_pic }}" /></td>
+		</tr>
+		</table>
+	</div>
+	<p />
+	<p><H1>Statistics</H1></p>
+	<div id="statistics" class="contentBorder contentField innerContentBorder">
+		Number of messages: {{ user_controller.get_stats.msg_count }}<br />
+		Of which are answers: {{ user_controller.get_stats.answer_count }}
+	</div>
+{% endif %}
+{% endblock %}

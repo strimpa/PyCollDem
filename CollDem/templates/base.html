@@ -1,0 +1,43 @@
+{% load staticfiles %}
+<html>
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'Site.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'scripts/lib/jquery-ui.min.css' %}" />
+		<script type="text/javascript">
+			userID = 
+			{% if user.is_authenticated %}
+				"{{ user.guid }}";
+			{% else %}
+				"0";
+			{% endif %}
+		</script>
+		<script data-main="{% static 'scripts/main' %}" src="{% static 'scripts/require.js' %}"></script>
+	</head>o
+	<body>
+	    <div class="page">
+	        <header>
+	            <div id="title">
+	                <a href="/"><img width="200px" src="{% static 'images/logo.png' %}"></a>
+	            </div>
+	            <div id="logindisplay" class="contentField">
+	                {% include "logOnDisplay.html" %}
+	            </div>
+	            <br style="clear:both;" />
+	            <nav>
+	                <ul id="menu">
+	                    <li>Home</li>
+	                    <li>About</li>
+	                </ul>
+	            </nav>
+	        </header>
+	        <section id="main" class="contentField">
+				{% block content %}{% endblock %}
+	        </section>
+	        <footer>
+	        </footer>
+	    </div>
+
+	    <div id="dialogDummy" />
+	</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+	<div id="registerUser" class="contentBorder contentField innerContentBorder">
+		<table>
+		{{ register_form.as_table }}
+		</table>
+	</div>
+{% endblock %}
