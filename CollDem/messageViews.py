@@ -2,26 +2,33 @@ import json
 import string
 
 from django.shortcuts import render, render_to_response
-from CollDem.models import CollDemUser, Message
 from django.http import HttpResponse, HttpResponseRedirect
-from CollDem.json_convert import CollDemEncoder
-from forms import AnswerForm
 from django.template import RequestContext
 from django.utils import timezone
+from django.db.models import Q
+from CollDem.models import CollDemUser, Message
+from CollDem.json_convert import CollDemEncoder
+from forms import AnswerForm
 from CollDem.controllers import MessageController
 
-def messages(request, userid=None, answer_to=None, msgid=None):
+def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 	messagesToShow = None
 	if msgid!=None:
 		messagesToShow = (Message.objects.filter(guid=msgid))
-	elif answer_to!=None:
-		messagesToShow = (Message.objects.filter(answer_to_id=answer_to))
+	elif authorid!=None:
+		messagesToShow = (Message.objects.filter(author_id=authorid, answer_to_id=answer_to))
 	elif userid!=None:
-		messagesToShow = (Message.objects.filter(author_id=userid, answer_to_id=None))
-#		messagesToShow.append(Message.objects.filter(visible_to_users__contains=userid))
+#		connectionVis =  
+		messagesToShow = Message.objects.filter(
+			Q(visibility="PUBLIC") |
+			Q(visibility="CONNECTIONS", author__in=request.user.connections.all()) |
+			Q(visibility="USERS", guid__in=request.user.visible_messages.all().values('guid')), 
+			answer_to_id=answer_to)
+			
 #		messagesToShow.append(Message.objects.filter(author__connections__contains=userid, visibility="CONNECTIONS"))
+		messagesToShow = messagesToShow.exclude(author=request.user)
 	else:
-		messagesToShow = Message.objects.filter(visibility="PUBLIC")
+		messagesToShow = Message.objects.filter(visibility="PUBLIC", answer_to_id=answer_to)
 
 	messagesToShow = messagesToShow.order_by('created_at')
 
@@ -83,3 +90,6 @@ def answer(request):
 		'answer_form':answer_form, 
 		}, 
 		context_instance=RequestContext(request))
+
+def evaluation(request, msgid=None):
+	return render(request, 'evaluationImage.svg', {})

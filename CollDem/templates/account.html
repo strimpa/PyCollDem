@@ -5,7 +5,7 @@
 {% block content %}
 	<p><H1>Public profile of {{ user_controller.the_user.username }}</H1></p>
 	<div id="userProfile" class="contentBorder contentField innerContentBorder">
-		<form action="/register/" enctype="multipart/form-data" method="POST">{% csrf_token %}
+		<form action="/account/" enctype="multipart/form-data" method="POST">{% csrf_token %}
 		<table>
 		{{ profile_form.as_table }}
 		</table>
@@ -15,7 +15,7 @@
 	<p />
 	<p><H1>Private account information</H1></p>
 	<div id="account" class="contentBorder contentField innerContentBorder">
-		<form action="/register/" method="POST">{% csrf_token %}
+		<form action="/account/" method="POST">{% csrf_token %}
 		<table>
 		{{ account_form.as_table }}
 		</table>

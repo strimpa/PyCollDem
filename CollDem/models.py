@@ -1,8 +1,11 @@
 import random
+import datetime
 
 from django.db import models
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser, PermissionsMixin)
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 # Meembership
 
@@ -16,17 +19,21 @@ class SocialNetwork(models.Model):
 
 class CollDemUserManager(BaseUserManager):
 
-	def __init__(self, user=None):
+	def set_user(self, user):
 		self.the_user = user
 
 	def valid_user(self):
 		return isinstance(self.the_user, CollDemUser)
 
-	def get_pic(self):
+	def get_pic(self, user=None):
 		"logic to access the picture or get default one if undefined"
-		if 	not self.valid_user() or None==self.the_user.pic.url:
-			return '/static/images/users/default_pic.gif'
-		return '/media/'+settings.MEDIA_URL+self.the_user.pic.url
+		if None!=user:
+			self.set_user(user)
+		if 	not self.valid_user() or \
+			not self.the_user.pic or \
+			None==self.the_user.pic.url:
+			return settings.MEDIA_URL+'/profile_pics/default_pic.gif'
+		return self.the_user.pic.url
 
 	def get_stats(self):
 		if 	not self.valid_user():
@@ -38,13 +45,24 @@ class CollDemUserManager(BaseUserManager):
 		stats['answer_count'] = stats['msg_count'] - rootMsgCount
 		return stats
 
+	def get_unique_id(self):
+		guid = random.getrandbits(60)
+		return guid
+		while(True):
+			try:
+				CollDemUser.objects.get(guid=guid)
+				guid = random.getrandbits(63)
+				#go on with while loop until exception is raised that no user exists
+			except ObjectDoesNotExist:
+				return guid
+
 	def create_user(self, username, email, password=None):
+		the_id = self.get_unique_id()
 		theuser = self.model(
-				guid = random.getrandbits(63),
+				guid = the_id,
 				username = username,
-				email = self.normalize_email(email),
-				date_joined = timezone.now()
-			)
+				email = self.normalize_email(email)
+		)
 		if None!=password:
 			theuser.set_password(password)
 		theuser.save(using=self._db)
@@ -54,6 +72,7 @@ class CollDemUserManager(BaseUserManager):
 	def create_superuser(self, username, email, password):
 		theuser = self.create_user(username, email, password)
 		theuser.is_admin = True
+		theuser.is_active = True
 		return theuser
 
 
@@ -61,7 +80,7 @@ class CollDemUser(AbstractBaseUser, PermissionsMixin):
 	guid = models.BigIntegerField("Unique ID", primary_key=True, editable=False)
 	first_name = models.CharField("First name", max_length=256, blank=True)
 	last_name = models.CharField("Second name", max_length=256, blank=True)
-	date_joined = models.DateTimeField("Created at", auto_now_add=True, editable=False)
+	date_joined = models.DateField("Created at", auto_now_add=True, editable=False)
 	username = models.CharField("User name", max_length=64, unique=True)
 	pic = models.ImageField(upload_to="profile_pics/%Y/", blank=True)
 	email = models.EmailField("Email")
@@ -70,7 +89,7 @@ class CollDemUser(AbstractBaseUser, PermissionsMixin):
 
 	#AbtractBaseUser contract  
 	is_staff = models.BooleanField(default=False)
-	is_active = models.BooleanField(default=True)
+	is_active = models.BooleanField(default=False)
 	is_admin = models.BooleanField(default=False)
 
 	objects = CollDemUserManager()
@@ -119,4 +138,32 @@ class Message(models.Model):
 	
 	def __unicode__(self):
 		return self.header
-	
+
+class EvaluationSet(models.Model):
+	evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="The user giving the evaluation.", related_name="my_evaluations")
+	target_msg = models.ForeignKey(Message, verbose_name="The evaluated message.", related_name="user_evaluation")
+	comment = models.OneToOneField(Message, verbose_name="The answer message commenting the evaluation.", related_name="commented_evaluation")
+
+	def __unicode__(self):
+		returnString = "Evaluation\nEvaluator:"+evaluator.username
+		for e in evaluation_set:
+			returnString += "\t"+e.name+":"+str(e.factor)
+		return 
+
+
+class Evaluation(models.Model):
+	"A tuple pair for a user evaluation"
+
+	EVAL_DEFAULT_CHOICES = (
+		('HELPFUL', 'helpful'),
+		('FUNNY', 'funny'),
+		('INSPIRATIONAL', 'inspirational'),
+	)
+
+	name = models.CharField("Descriptor or the evaluation", max_length="64", choices=EVAL_DEFAULT_CHOICES)
+	factor = models.FloatField("The evaluation value")
+	evaluation_set = models.ForeignKey(EvaluationSet)
+
+	def __unicode__(self):
+		return (name+":"+str(factor))
+

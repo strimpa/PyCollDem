@@ -5,6 +5,7 @@ require.config({
 	paths: {
 		jquery: 'lib/jquery-2.1.1',
 		jqueryui: 'lib/jquery-ui.min',
+		snap:'lib/snap.svg'
 	}
 });
 
@@ -113,6 +114,12 @@ $ = require(
 				})
 			});
 		});
+		msgDiv.find("#evaluation").each(function(){
+			var msgEvalDiv = $(this);
+			//conn.getEvaluationImage(msgID, function(result){
+				ui.renderEvaluationImage(msgEvalDiv, msg['evaluation']);
+			//})
+		});
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -169,9 +176,10 @@ $ = require(
 	///////////////////////////////////////////////////////////////////////
 
 	var messages = $("#messages");
-	if(null!=messages)
+	if(messages.length)
 	{
-		if(null!=urlMsgId && ""!=urlMsgId)
+		console.log("messages:"+messages);
+		if(undefined!=urlMsgId && ""!=urlMsgId)
 		{
 			conn.getMessageWithId(urlMsgId, function(result){
 				renderMsgCB(result, messages);
@@ -184,6 +192,22 @@ $ = require(
 			});
 		}
 	}
+
+	$("#followButton").each(function(){
+		button = $(this);
+		console.log("found a button!"+button);
+		button.click(function(){
+			clicked_button = $(this);
+			clicked_button.val("please wait...");
+			clicked_button.attr("enabled", "false");
+
+			var userToFollow = clicked_button.attr("userid");
+			conn.followUser(userToFollow, function(result){
+				clicked_button.val("Unfollow");
+				clicked_button.attr("enabled", "true");
+			});
+		});
+	});
 
 	return $;
 });

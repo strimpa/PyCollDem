@@ -2,27 +2,36 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import Textarea
 from django.forms.models import modelformset_factory
 from django.utils import timezone
 
-from CollDem.forms import LogOnForm, EnterMessageForm
+from CollDem.forms import LoginForm, EnterMessageForm
 from CollDem.models import Message, CollDemUser
 from CollDem.controllers import MessageController
 
-def handleUserForm(request):
-	logon_form = LogOnForm()
-	if request.method=='POST' and 'username' in request.POST and 'password' in request.POST:
-		username = request.POST['username']
-		password = request.POST['password']
+class LoginError(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __unicode__(serlf):
+		return repr(self.value)
 
-		user = authenticate(username=username, password=password)
-		if user is not None and user.is_active:
+def handleUserForm(request):
+	login_form = LoginForm()
+	if request.method=='POST' and 'username' in request.POST and 'password' in request.POST:
+		login_form = LoginForm(data=request.POST)
+		if login_form.is_valid():
+			username = login_form.cleaned_data['username']
+			password = login_form.cleaned_data['password']
+
+			user = authenticate(username=username, password=password)
+			if not user.is_active or user is None:
+				raise LoginError('REG_CONFIRMATION_FAILED')
+			
 			login(request, user)
-		else:
-			logon_form = LogOnForm(data=request.POST)
-	return logon_form
+
+	return login_form
 
 def handleMessageForm(request):
 	entermsg_form = EnterMessageForm()
@@ -50,18 +59,22 @@ def handleMessageForm(request):
 
 def home(request, urlMsgId=""):
 	entermsg_form = None
-	logon_form = None
+	login_form = None
 
 	user = request.user
 
-	logon_form = handleUserForm(request)
+	try:
+		login_form = handleUserForm(request)
+	except:
+		return HttpResponseRedirect('/register/confirm/')
+
 	entermsg_form = handleMessageForm(request)
 
 	MessageFormSet = modelformset_factory(Message, fields=['header', 'text'], widgets={'text':Textarea()})
 	message_formset = MessageFormSet(queryset=Message.objects.all())
 
 	return render(request, 'home.html', {
-		'logon_form'			: logon_form, 
+		'login_form'			: login_form, 
 		'entermsg_form'			: entermsg_form, 
 		'message_formset'		: message_formset, 
 		'no_message_selected'	: urlMsgId=="",

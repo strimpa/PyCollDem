@@ -90,8 +90,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+EMAIL_HOST = 'mail.tuets.com'
+
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = 'mail@tuets.com'
+
+EMAIL_HOST_PASSWORD = 'ernieundbert'
+
+EMAIL_USE_TLS = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_URL = '/media/'

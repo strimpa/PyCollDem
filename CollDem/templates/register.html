@@ -3,9 +3,18 @@
 {% block title %} Homepage {% endblock %}
 
 {% block content %}
+{% if confirmation %}
 	<div id="registerUser" class="contentBorder contentField innerContentBorder">
+		{{ confirmation_text }}
+	</div>
+{% else %}
+	<div id="registerUser" class="contentBorder contentField innerContentBorder">
+		<form action="/register/" enctype="multipart/form-data" method="POST">{% csrf_token %}
 		<table>
 		{{ register_form.as_table }}
 		</table>
+		<input type="submit" value="submit" />
+		</form>
 	</div>
+{% endif %}
 {% endblock %}

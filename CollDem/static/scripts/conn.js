@@ -12,9 +12,31 @@ define(
 		jAjaxRequest.done(func);
 	}
 
-	getMessagesForUser = function(userID, func)
+	getMessagesFromUser = function(userID, func)
 	{
 		var theurl = "/messages/author/"+userID;
+		var serverdata = {};
+
+		sendAjax({
+			url:theurl, 
+			data:serverdata
+		}, func);
+	}
+
+	getMessagesForUser = function(userID, func)
+	{
+		var theurl = "/messages/"+userID;
+		var serverdata = {};
+
+		sendAjax({
+			url:theurl, 
+			data:serverdata
+		}, func);
+	}
+
+	followUser = function(userID, func)
+	{
+		var theurl = "/account/follow/"+userID;
 		var serverdata = {};
 
 		sendAjax({
@@ -66,6 +88,14 @@ define(
 		sendAjax({
 			url:theurl, 
 			data:serverdata
+		}, func);
+	}
+
+	getEvaluationImage = function(msgID, func)
+	{
+		sendAjax({
+			url:"/media/eval/"+msgID, 
+			data:{}
 		}, func);
 	}
 

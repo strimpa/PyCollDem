@@ -6,6 +6,7 @@
 {% if not user_controller.valid_user %}
 	<div>No user has been found for the user ID or username given.</div>
 {% else %}
+	<p><input id="followButton" userid="{{ user_controller.the_user.guid }}" type="button" value="Follow" /></p>
 	<p><H1>Public profile of {{ user_controller.the_user.username }}</H1></p>
 	<div id="userProfile" class="contentBorder contentField innerContentBorder">
 		<table>
@@ -16,6 +17,13 @@
 		<td>Avatar image:</td><td><img src="{{ user_controller.get_pic }}" /></td>
 		</tr>
 		</table>
+	</div>
+	<p />
+	<p><H1>Connections</H1></p>
+	<div id="connection" class="contentBorder contentField innerContentBorder">
+		{% for user in user_controller.the_user.connections.all %}
+			<p>{{ user.username }}</p>
+		{% endfor %}
 	</div>
 	<p />
 	<p><H1>Statistics</H1></p>

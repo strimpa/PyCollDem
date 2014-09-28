@@ -32,28 +32,3 @@ class MessageController:
 			return savestring
 
 		return None
-
-class UserController:
-	"Class to manage user instances"
-
-	def __init__(self, user):
-		self.the_user = user
-
-	def valid_user(self):
-		return isinstance(self.the_user, CollDemUser)
-
-	def get_pic(self):
-		"logic to access the picture or get default one if undefined"
-		if 	not self.valid_user() or None==self.the_user.pic.url:
-			return '/static/images/users/default_pic.gif'
-		return '/media/'+settings.MEDIA_URL+self.the_user.pic.url
-
-	def get_stats(self):
-		if 	not self.valid_user():
-			return None
-		stats = {}
-		user_msgs = Message.objects.filter(author=self.the_user)
-		stats['msg_count'] = len(user_msgs)
-		rootMsgCount = len(user_msgs.filter(answer_to=None))
-		stats['answer_count'] = stats['msg_count'] - rootMsgCount
-		return stats
