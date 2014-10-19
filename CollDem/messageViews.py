@@ -6,10 +6,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.utils import timezone
 from django.db.models import Q
-from CollDem.models import CollDemUser, Message
+from CollDem.models import CollDemUser, Message, Evaluation, EvaluationSet
 from CollDem.json_convert import CollDemEncoder
 from forms import AnswerForm
 from CollDem.controllers import MessageController
+from django.core.exceptions import ObjectDoesNotExist
 
 def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 	messagesToShow = None
@@ -17,16 +18,14 @@ def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 		messagesToShow = (Message.objects.filter(guid=msgid))
 	elif authorid!=None:
 		messagesToShow = (Message.objects.filter(author_id=authorid, answer_to_id=answer_to))
-	elif userid!=None:
-#		connectionVis =  
+	elif userid!=None and userid!="0":
 		messagesToShow = Message.objects.filter(
 			Q(visibility="PUBLIC") |
 			Q(visibility="CONNECTIONS", author__in=request.user.connections.all()) |
 			Q(visibility="USERS", guid__in=request.user.visible_messages.all().values('guid')), 
 			answer_to_id=answer_to)
 			
-#		messagesToShow.append(Message.objects.filter(author__connections__contains=userid, visibility="CONNECTIONS"))
-		messagesToShow = messagesToShow.exclude(author=request.user)
+#		messagesToShow = messagesToShow.exclude(author=request.user)
 	else:
 		messagesToShow = Message.objects.filter(visibility="PUBLIC", answer_to_id=answer_to)
 
@@ -35,7 +34,7 @@ def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 	data = []
 	if len(messagesToShow) > 0: 
 		for msg in messagesToShow:
-			msg.canDelete = (msg.author == request.user)
+			msg.requestUser = request.user
 			messageJsonObj = json.dumps(msg, cls=CollDemEncoder)
 			data.append(messageJsonObj)
 
@@ -93,3 +92,32 @@ def answer(request):
 
 def evaluation(request, msgid=None):
 	return render(request, 'evaluationImage.svg', {})
+
+def evaluate(request, msgid):
+	# if request.method!='POST':
+	# 	return HttpResponse("BAD EVALUATION REQUEST", content_type='text/plain')
+	msg = Message.objects.get(guid=msgid)
+	msgController = MessageController(msg)
+
+	if not msgController.mayUserInteract(request.user):
+		data = json.dumps(msgController.getEvaluation())
+		return HttpResponse(data, content_type='application/json')
+
+	try:
+		evalSet = EvaluationSet.objects.get(evaluator=request.user, target_msg=msg)
+	except ObjectDoesNotExist:
+		evalSet = EvaluationSet.objects.create(evaluator=request.user, target_msg=msg)
+
+	for postVarKey,postVarVal in request.POST.items():
+		evaluation = None
+		try:
+			evaluation = evalSet.evaluation_set.get(name=postVarKey)
+			evaluation.factor = float(postVarVal)
+			evaluation.save()
+		except ObjectDoesNotExist:
+			evaluation = Evaluation.objects.create(name=postVarKey, factor=float(postVarVal), evaluation_set=evalSet)
+	evalSet.save()
+
+	data = json.dumps(msgController.getEvaluation(request.user))
+
+	return HttpResponse(data, content_type='application/json')

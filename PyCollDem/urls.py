@@ -19,7 +19,8 @@ urlpatterns = patterns('',
     #actions
     url(r'^logout/$', 'CollDem.views.logout_view'),
     url(r'^answer/$', 'CollDem.messageViews.answer'),
-    url(r'^messages/delete/(?P<msgid>\w+)', 'CollDem.messageViews.delete'),
+    url(r'^messages/delete/(?P<msgid>\w+)$', 'CollDem.messageViews.delete'),
+   	url(r'^messages/evaluate/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluate'),
 
     #message queries
     url(r'^messages/answer/(?P<answer_to>\w+)$', 'CollDem.messageViews.messages'),

@@ -142,7 +142,7 @@ class Message(models.Model):
 class EvaluationSet(models.Model):
 	evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="The user giving the evaluation.", related_name="my_evaluations")
 	target_msg = models.ForeignKey(Message, verbose_name="The evaluated message.", related_name="user_evaluation")
-	comment = models.OneToOneField(Message, verbose_name="The answer message commenting the evaluation.", related_name="commented_evaluation")
+	comment = models.OneToOneField(Message, verbose_name="The answer message commenting the evaluation.", related_name="commented_evaluation", null=True)
 
 	def __unicode__(self):
 		returnString = "Evaluation\nEvaluator:"+evaluator.username

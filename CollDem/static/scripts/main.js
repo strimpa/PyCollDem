@@ -5,7 +5,10 @@ require.config({
 	paths: {
 		jquery: 'lib/jquery-2.1.1',
 		jqueryui: 'lib/jquery-ui.min',
-		snap:'lib/snap.svg'
+		snap:'lib/snap.svg',
+		sylvester:'lib/sylvester',
+		jCookie:'lib/jquery.cookie',
+		underscore:'lib/underscore-min'
 	}
 });
 
@@ -17,6 +20,7 @@ $ = require(
 	///////////////////////////////////////////////////////////////////////
 	// constants
 	var max_depth = 2;
+	var csrftoken = $.cookie('csrftoken');
 	// jquery extensions
 	$.exists = function(selector){return ($(selector).length > 0);}
 
@@ -117,7 +121,7 @@ $ = require(
 		msgDiv.find("#evaluation").each(function(){
 			var msgEvalDiv = $(this);
 			//conn.getEvaluationImage(msgID, function(result){
-				ui.renderEvaluationImage(msgEvalDiv, msg['evaluation']);
+				ui.renderEvaluationImage(msgEvalDiv, msg['evaluation'], msgID, conn);
 			//})
 		});
 	}
@@ -174,6 +178,17 @@ $ = require(
 	///////////////////////////////////////////////////////////////////////
 	// startup triggers
 	///////////////////////////////////////////////////////////////////////
+	function csrfSafeMethod(method) {
+		// these HTTP methods do not require CSRF protection
+		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	}
+	$.ajaxSetup({
+		beforeSend: function(xhr, settings) {
+			if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+				xhr.setRequestHeader("X-CSRFToken", csrftoken);
+			}
+		}
+	});
 
 	var messages = $("#messages");
 	if(messages.length)
@@ -208,6 +223,15 @@ $ = require(
 			});
 		});
 	});
+
+	$.assocArraySize = function(obj) {
+	    // http://stackoverflow.com/a/6700/11236
+	    var size = 0, key;
+	    for (key in obj) {
+	        if (obj.hasOwnProperty(key)) size++;
+	    }
+	    return size;
+	};
 
 	return $;
 });

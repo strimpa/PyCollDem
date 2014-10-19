@@ -1,6 +1,7 @@
 import json
 from json import JSONEncoder
 from CollDem.models import Message, CollDemUser, EvaluationSet
+from CollDem.controllers import MessageController
 from django.conf.urls.static import static
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -16,17 +17,18 @@ class CollDemEncoder(JSONEncoder):
 			return returnObject
 
 		if isinstance(obj, Message):
+			controller = MessageController(obj)
 			returnObject = {
 				'id':obj.guid,
 				'author':obj.author.username,
 				'avatar':CollDemUser.objects.get_pic(obj.author),
 				'header':obj.header, 
 				'text':obj.text,
-				'can_delete':obj.canDelete,
-				'evaluation':{}
+				'can_delete':(obj.author == obj.requestUser),
+				'evaluation':controller.getEvaluation(obj.requestUser)
 			}
-			for evalSet in obj.user_evaluation.all():
-				returnObject['evaluation'].append(self.default(evalSet))
+			# for evalSet in obj.user_evaluation.all():
+			# 	returnObject['evaluation'].append(self.default(evalSet))
 
 			return returnObject
 

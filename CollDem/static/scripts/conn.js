@@ -99,5 +99,14 @@ define(
 		}, func);
 	}
 
+	sendEvaluation = function(msgID, evalList, func)
+	{
+		sendAjax({
+			url:"/messages/evaluate/"+msgID,
+			data:evalList,
+			type:'POST'
+		}, func);
+	}
+
 	return this;
 });

@@ -1,6 +1,10 @@
 define(
-	['jqueryui', 'snap'], function(jui, snap)
+	['jqueryui', 'jCookie', 'EvaluationSvg'], function(jui, jCookie, evalImage)
 {
+	// helpers
+
+
+	// public functions 
 	renderMessage = function(parentNode, msg, isAnswer=false)
 	{
 		var messageDiv = div(parentNode, {id:("message_"+msg['id'])});
@@ -77,45 +81,10 @@ define(
 		})
 	}
 
-	renderEvaluationImage = function(parent, evalObj)
+	renderEvaluationImage = function(parent, evalObj, msgID, conn)
 	{
-		parent.empty();
-		var totalWidth = 50;
-		var halfWidth = 25;
-		var s = Snap(totalWidth, totalWidth);
-		var numEvaluations = evalObj.length>3 ? evalObj.length : 3;
-		var innerRadius = 3;
-		var outerRadius = 25;
-		var step = (2 * Math.PI) / numEvaluations;
-		var innerpolys = [];
-		var outerpolys = [];
-		for (var i=0;i<numEvaluations;i++) {
-			var x = Math.sin(i * step);
-			var y = Math.cos(i * step);
-			innerpolys.push(halfWidth + x *innerRadius);
-			innerpolys.push(halfWidth - y *innerRadius);
-			outerpolys.push(halfWidth + x *outerRadius);
-			outerpolys.push(halfWidth - y *outerRadius);
-		};
-		console.log("outerpolys:"+outerpolys);
-		var lowerRange = s.polygon(innerpolys);
-		lowerRange.attr({
-		    fill: "#666",
-		    stroke: "none",
-		    strokeWidth: 5
-		});
-		var highRange = s.polygon(outerpolys);
-		highRange.attr({
-		    fill: "none",
-		    stroke: "#666",
-		    strokeWidth: 2
-		});
-		parent.append(s.node);
-	}
-
-	renderEvaluationTool = function(parent, evalObj)
-	{
-		
+		var image = evalImage.CreateEvaluationImage(evalObj, msgID, conn);
+		parent.append(image.node);
 	}
 
 	return this;
