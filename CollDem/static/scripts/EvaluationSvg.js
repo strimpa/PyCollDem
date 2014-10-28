@@ -58,16 +58,16 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 			}
 		}
 
-		function renderPolygon(radius, group, attrs, useOffsets=true, useUserOffsets=false)
+		function renderPolygon(radius, group, attrs, useOffsets, useUserOffsets)
 		{
 			var vertices = [];
 			var returnArray = [];
 			var step = (2 * Math.PI) / directions.length;
 			for(var i in directions) {
 				var userOffset = 0;
-				if(useOffsets)
+				if(useOffsets==true)
 				{
-					if(useUserOffsets)
+					if(useUserOffsets==true)
 					{
 						var summaryKey = _.keys(currEvalObj)[i];
 						if(summaryKey in evalObj['activeUserEvaluation'])
