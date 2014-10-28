@@ -1,5 +1,0 @@
-[client]
-database = 'collective'
-user = 'django_user'
-password = 'collective'
-default-character-set = utf8
