@@ -153,8 +153,11 @@ $ = require(
 		}, formData);
 	}
 
-	function renderMsgCB(result, parent, depth=0, answerCount=undefined)
+	function renderMsgCB(result, parent, depth, answerCount)
 	{
+		if(depth==null)
+			depth = 0
+
 		var myAnswerCount = {'local':0, 'global':0};
 
 		if(result.length<=0)
