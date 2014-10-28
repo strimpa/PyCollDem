@@ -5,7 +5,7 @@ define(
 
 
 	// public functions 
-	renderMessage = function(parentNode, msg, isAnswer=false)
+	renderMessage = function(parentNode, msg, isAnswer)
 	{
 		var messageDiv = div(parentNode, {id:("message_"+msg['id'])});
 		messageDiv.attr("message_id", msg['id']);
@@ -17,7 +17,7 @@ define(
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
 		messageDiv.append(answerActions);
 		var classString = "contentField messageDimensions";
-		if(isAnswer)
+		if(isAnswer==true)
 			classString += " answerDiv";
 		else
 			classString += " innerContentBorder";
@@ -38,13 +38,13 @@ define(
 		msgHeaderDiv.text(answerCount);
 	}
 
-	div = function(parentNode=undefined, params=undefined)
+	div = function(parentNode, params)
 	{
 		var theDiv = $("<div />");
-		if(parentNode!=undefined)
+		if(parentNode!=null)
 			parentNode.append(theDiv);
 		var classString = "contentField messageDimensions";
-		if(undefined!=params)
+		if(null!=params)
 		{
 			if(undefined!=params.id)
 				theDiv.attr("id", params.id);
@@ -59,11 +59,11 @@ define(
 		return theDiv;
 	}
 
-	br = function(parentNode, clearFloat=false)
+	br = function(parentNode, clearFloat)
 	{
 		var br = $("<br />");
 		parentNode.append(br);
-		if(clearFloat)
+		if(clearFloat==true)
 			br.css("clear", "both");
 	}
 
