@@ -4,7 +4,6 @@ import string
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.utils import timezone
 from django.db.models import Q
 from CollDem.models import CollDemUser, Message, Evaluation, EvaluationSet
 from CollDem.json_convert import CollDemEncoder
@@ -69,19 +68,7 @@ def answer(request):
 
 			visValue = answer_form.cleaned_data['visibility']
 			text = answer_form.cleaned_data['text']
-			userid = None
-			if request.user.is_authenticated:
-				userid = request.user.guid
-
-			new_msg = Message(
-				answer_to_id=answer_to,
-				header=header, 
-				text=text, 
-				created_at=timezone.now(),
-				author_id=userid,
-				visibility=visValue)
-			new_msg.guid=MessageController.createUniqueIDString(new_msg)
-			new_msg.save()
+			MessageController.createMessage(answer_to, header, text, request, visValue)
 	else:
 		answer_form = AnswerForm()
 

@@ -38,7 +38,8 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		var summaryGroup = canvas.group();
 		var lineGroup = canvas.group();
 		var gripGroup = canvas.group();
-		var currEvalObj = evalObj['summary'];
+		var keywords = [];
+		var currEvalObj = null;
 
 		var thisCallbackTarget = this;
 
@@ -47,10 +48,10 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		var calcDirections = function()
 		{
 			directions = [];
-			var numSteps = $.assocArraySize(currEvalObj);
+			var numSteps = keywords.length;
 			var step = (2 * Math.PI) / numSteps;
 			var i=0;
-			for (key in currEvalObj) {
+			for (key in keywords) {
 				var x =  Math.sin(i * step);
 				var y = - Math.cos(i * step);
 				directions.push($V([x,y]).toUnitVector());
@@ -63,18 +64,21 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 			var vertices = [];
 			var returnArray = [];
 			var step = (2 * Math.PI) / directions.length;
-			for(var i in directions) {
+			for(var i=0;i<keywords.length;i++) {
+				var keyword = keywords[i];
 				var userOffset = 0;
-				if(useOffsets==true)
+				if(useOffsets!=false)
 				{
 					if(useUserOffsets==true)
 					{
-						var summaryKey = _.keys(currEvalObj)[i];
-						if(summaryKey in evalObj['activeUserEvaluation'])
-							userOffset = evalObj['activeUserEvaluation'][summaryKey];
+						if(keyword in evalObj['activeUserEvaluation'])
+							userOffset = evalObj['activeUserEvaluation'][keyword];
 					}
 					else
-						userOffset = _.values(currEvalObj)[i];
+					{
+						if(keyword in currEvalObj)
+							userOffset = currEvalObj[keyword];
+					}
 				}
 				var factor = userOffset + radius;
 				var x = halfWidth + factor * directions[i].elements[0];
@@ -143,7 +147,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				var handle = canvas.circle(vertices[i].x, vertices[i].y, 0);
 				handle.attr(toolHandleAttrs);
 				handle.myDir = directions[i];
-				handle.label = _.keys(currEvalObj)[i];
+				handle.label = keywords[i];
 				handle.lastPos = vertices[i].offset;
 				handle.myTool = thisCallbackTarget;
 //				handleGroup.add(handle);
@@ -182,6 +186,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		this.reset = function(evalObj)
 		{
 			currEvalObj = evalObj['summary'];
+			keywords = evalObj['keywords'];
 			calcDirections();
 			updateSummaryGroup();
 		}

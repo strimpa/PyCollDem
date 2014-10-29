@@ -1,7 +1,9 @@
 import re, random
 
-from CollDem.models import Message, CollDemUser
+from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation
 from django.conf import settings
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 class MessageController:
 	
@@ -33,6 +35,42 @@ class MessageController:
 
 		return None
 
+	@classmethod
+	def AddEvalKeyword(cls, msg, keyword):
+		try:
+			keywords = KeywordList.objects.get(for_msg=msg)
+		except ObjectDoesNotExist:
+			keywords = KeywordList.objects.create(msg)
+			keywords.save()
+
+		try:
+			key = Keyword.objects.get(name=keyword)
+		except ObjectDoesNotExist:
+			key = Keyword.objects.create(name=keyword)
+		keywords.keyword_set.add(key)
+		keywords.save()
+
+	@classmethod
+	def createMessage(cls, answer_to, header, text, request, visValue):
+		userid = None
+		if request.user.is_authenticated:
+			userid = request.user.guid
+
+		new_msg = Message(
+			answer_to_id=answer_to,
+			header=header, 
+			text=text, 
+			created_at=timezone.now(),
+			author_id=userid,
+			visibility=visValue)
+		new_msg.guid=cls.createUniqueIDString(new_msg)
+		new_msg.save()
+
+		keywords = KeywordList(for_msg=new_msg)
+		keywords.save()
+		for defaultKeyTuple in Evaluation.EVAL_DEFAULT_CHOICES:
+			cls.AddEvalKeyword(new_msg, defaultKeyTuple[0])
+
 	def __init__(self, msg):
 		self.myMsg = msg
 
@@ -47,6 +85,12 @@ class MessageController:
 	def getEvaluation(self, user=None):
 		evaluation = {}
 		evaluation['summary'] = {}
+		evaluation['keywords'] = []
+		try:
+			for keyword in self.myMsg.keywordlist.keyword_set.all().values("name"):
+				evaluation['keywords'].append(keyword['name']);
+		except:
+			pass
 		evaluation['can_evaluate'] = None!=user and user.is_authenticated() and self.myMsg.author != user
 		evaluation['activeUserEvaluation'] = {}
 		for es in self.myMsg.user_evaluation.all():

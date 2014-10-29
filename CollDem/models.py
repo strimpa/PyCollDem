@@ -139,6 +139,13 @@ class Message(models.Model):
 	def __unicode__(self):
 		return self.header
 
+class KeywordList(models.Model):
+	for_msg = models.OneToOneField(Message, verbose_name="The message for which these keyworkds are created")
+
+class Keyword(models.Model):
+	name = models.CharField("Keyword", max_length="128", primary_key=True)
+	keywordset = models.ManyToManyField(KeywordList)
+
 class EvaluationSet(models.Model):
 	evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="The user giving the evaluation.", related_name="my_evaluations")
 	target_msg = models.ForeignKey(Message, verbose_name="The evaluated message.", related_name="user_evaluation")

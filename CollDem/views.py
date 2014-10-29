@@ -5,7 +5,6 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import Textarea
 from django.forms.models import modelformset_factory
-from django.utils import timezone
 
 from CollDem.forms import LoginForm, EnterMessageForm
 from CollDem.models import Message, CollDemUser
@@ -42,18 +41,7 @@ def handleMessageForm(request):
 			visValue = entermsg_form.cleaned_data['visibility']
 			header = entermsg_form.cleaned_data['header']
 			text = entermsg_form.cleaned_data['text']
-			userid = None
-			if request.user.is_authenticated:
-				userid = request.user.guid
-
-			new_msg = Message(
-				header=header, 
-				text=text, 
-				created_at=timezone.now(),
-				author_id=userid,
-				visibility=visValue)
-			new_msg.guid=MessageController.createUniqueIDString(new_msg)
-			new_msg.save()
+			MessageController.createMessage(None, header, text, request, visValue)
 
 	return entermsg_form
 
