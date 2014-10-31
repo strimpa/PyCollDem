@@ -40,6 +40,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		var gripGroup = canvas.group();
 		var keywords = [];
 		var currEvalObj = null;
+		var myLabel = $("#evalLabel_"+msgID);
 
 		var thisCallbackTarget = this;
 
@@ -180,6 +181,9 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 					conn.sendEvaluation(msgID, evalList, this.myTool.reset);
 				};
 				handle.drag(moveFn, startFn, endFn);
+				handle.hover(function(){
+					myLabel.text(this.label);
+				});
 			};
 		}
 

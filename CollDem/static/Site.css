@@ -115,14 +115,15 @@ header h1, #header h1 {
 }
 
 .contentField {
-    border-radius: 8px 0 0 0;
+    border-radius: 8px 0px 0px 8px;
     -webkit-border-radius: 8px 0 0 0;
     -moz-border-radius: 8px 0 0 0;
 }
 
 .innerContentBorder{
-    padding-left: 5px;
-    border-width: 1px;
+    padding-left: 10px;
+    border-width: 0px 0px 0px 1px;
+    border-radius: 8px 0px 0px 8px;
     border-style: solid;
     border-color: white;
 }
@@ -131,9 +132,6 @@ header h1, #header h1 {
 {
     max-width: 400px;
     min-width: 300px;
-
-    padding: 1px;
-    margin: 1px;
 }
 
 .answerBox
@@ -150,7 +148,7 @@ header h1, #header h1 {
 #main {
     margin-top: 15px;
     margin-left: 15px;
-    padding: 30px 30px 15px 30px;
+    padding: 10px;
     background-color: #01723b;
 }
 
@@ -191,20 +189,32 @@ footer,
 .msgPic
 {
     width:25px;
-    float:left;
     padding:2px;
 }
 
-.msgUserInfo
+.msgUserInfoGroup
 {
+    text-align: center;
+    vertical-align: bottom;
     float:right;
-    padding:5px;
+    margin:2px;
+    padding:2px;
+    width:80px;
+    height:62px;
+}
+.evaluationGroup
+{
+    text-align: center;
+    float:right;
+    padding:2px;
+    margin:2px;
+    width:80px;
+    height:62px;
 }
 
 /* TAB MENU   
 ----------------------------------------------------------*/
 ul#menu {
-    border-bottom: 1px #01723b solid;
     padding: 0 0 2px;
     position: relative;
     margin: 0;
@@ -267,10 +277,12 @@ textarea {
 }
 
 input[type="text"], 
-input[type="password"] {
+input[type="password"],
+input[type="file"],
+input[type="email"] {
     border: 1px solid #ccc;
     padding: 2px;
-    font-size: 1.2em;
+    font-size: 0.8em;
     color: #444;
     width: 200px;
 }
@@ -278,12 +290,12 @@ input[type="password"] {
 select {
     border: 1px solid #ccc;
     padding: 2px;
-    font-size: 1.2em;
+    font-size: 0.8em;
     color: #444;
 }
 
 input[type="submit"] {
-    font-size: 1.2em;
+    font-size: 1em;
     padding: 5px;
 }
 
@@ -326,7 +338,7 @@ div#title {
     display: block;
     float: left;
     text-align: left;
-    margin:20px;
+    margin:10px;
 }
 
 #logindisplay {
@@ -336,7 +348,7 @@ div#title {
     display: block;
     text-align: right;
     padding: 10px;
-    margin: 10px;
+    margin: 0px;
     color: White;
 }
 #logindisplay::after

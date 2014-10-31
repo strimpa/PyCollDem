@@ -9,7 +9,8 @@ define(
 	{
 		var messageDiv = div(parentNode, {id:("message_"+msg['id'])});
 		messageDiv.attr("message_id", msg['id']);
-		messageDiv.append("<div class='msgUserInfo'><img class='msgPic' src="+msg.avatar+" /> <strong><a href='/profile/"+msg.author+"'>"+msg.author+"</a></strong><br /><span id='evaluation' /></div>");
+		messageDiv.append("<div class='msgUserInfoGroup innerContentBorder contentField'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
+		messageDiv.append("<div class='evaluationGroup innerContentBorder contentField'><span id='evaluation' /><div id='evalLabel_"+msg['id']+"'></div>");
 		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
 		messageDiv.append("<p>"+msg.text+"</p>");
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
@@ -22,6 +23,7 @@ define(
 		else
 			classString += " innerContentBorder";
 		messageDiv.attr("class", classString);
+		messageDiv.append("<p style='clear:both;'/>");
 		return messageDiv;
 	}
 
@@ -42,7 +44,10 @@ define(
 	{
 		var theDiv = $("<div />");
 		if(parentNode!=null)
-			parentNode.append(theDiv);
+			if(true==params.prepend)
+				parentNode.prepend(theDiv);
+			else
+				parentNode.append(theDiv);
 		var classString = "contentField messageDimensions";
 		if(null!=params)
 		{

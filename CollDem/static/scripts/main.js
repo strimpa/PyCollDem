@@ -5,7 +5,7 @@ require.config({
 	paths: {
 		jquery: 'lib/jquery-2.1.1',
 		jqueryui: 'lib/jquery-ui.min',
-		snap:'lib/snap.svg',
+		snap:'lib/snap.svg-min',
 		sylvester:'lib/sylvester',
 		jCookie:'lib/jquery.cookie',
 		underscore:'lib/underscore-min'
@@ -53,7 +53,7 @@ $ = require(
 		}
 		else
 		{
-			var answerReplyHolder = ui.div(answerHolder, {renderBorder:false, id:replyID });
+			var answerReplyHolder = ui.div(answerHolder, {renderBorder:false, id:replyID, prepend:true });
 			conn.getAnswerForm(function(result)
 			{
 				var answerForm = ui.renderAnswerForm(answerReplyHolder, result);
