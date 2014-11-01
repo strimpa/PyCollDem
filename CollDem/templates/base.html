@@ -24,17 +24,17 @@
 	                {% include "logOnDisplay.html" %}
 	            </div>
 	            <br style="clear:both;" />
+	        </header>
+	        <section id="main">
+				{% block content %}{% endblock %}
+	        </section>
+	        <footer class="contentField">
 	            <nav>
 	                <ul id="menu">
 	                    <li>Home</li>
 	                    <li>About</li>
 	                </ul>
 	            </nav>
-	        </header>
-	        <section id="main" class="contentField">
-				{% block content %}{% endblock %}
-	        </section>
-	        <footer>
 	        </footer>
 	    </div>
 

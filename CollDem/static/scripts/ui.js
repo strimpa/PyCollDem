@@ -9,19 +9,18 @@ define(
 	{
 		var messageDiv = div(parentNode, {id:("message_"+msg['id'])});
 		messageDiv.attr("message_id", msg['id']);
-		messageDiv.append("<div class='msgUserInfoGroup innerContentBorder contentField'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
-		messageDiv.append("<div class='evaluationGroup innerContentBorder contentField'><span id='evaluation' /><div id='evalLabel_"+msg['id']+"'></div>");
+		messageDiv.append("<div class='msgUserInfoGroup innerContentBorder'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
+		messageDiv.append("<div class='evaluationGroup innerContentBorder'><span id='evaluation' /><div id='evalLabel_"+msg['id']+"'></div>");
 		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
 		messageDiv.append("<p>"+msg.text+"</p>");
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
 		if(msg['can_delete'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
 		messageDiv.append(answerActions);
-		var classString = "contentField messageDimensions";
+		var classString = "messageDimensions innerContentBorder";
 		if(isAnswer==true)
-			classString += " answerDiv";
-		else
-			classString += " innerContentBorder";
+			classString += " answerDiv ";
+
 		messageDiv.attr("class", classString);
 		messageDiv.append("<p style='clear:both;'/>");
 		return messageDiv;
@@ -48,7 +47,7 @@ define(
 				parentNode.prepend(theDiv);
 			else
 				parentNode.append(theDiv);
-		var classString = "contentField messageDimensions";
+		var classString = "messageDimensions";
 		if(null!=params)
 		{
 			if(undefined!=params.id)

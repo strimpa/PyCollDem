@@ -13,7 +13,7 @@ require.config({
 });
 
 $ = require(
-	['jquery', 'conn', 'ui'], function($, conn, ui)
+	['jquery', 'conn', 'ui', 'jqueryui'], function($, conn, ui)
 {
 	///////////////////////////////////////////////////////////////////////
 	// globals
@@ -226,6 +226,18 @@ $ = require(
 			});
 		});
 	});
+
+	$(function(){
+		var messageDrawerState = true;
+		$("#createMessage").css("height", "0px");
+		$("#createMessageExpand").click(function(){
+			if(messageDrawerState)
+				$("#createMessage").animate({height: "200px"}, 300);
+			else
+				$("#createMessage").animate({height: "0px"}, 300);
+			messageDrawerState = !messageDrawerState;
+		});
+	})
 
 	$.assocArraySize = function(obj) {
 	    // http://stackoverflow.com/a/6700/11236
