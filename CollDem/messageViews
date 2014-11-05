@@ -1,4 +1,0 @@
-from django.shortcurts import render_to_response
-
-def messages(id):
-	messagesToShow = Messages.objects.all()
