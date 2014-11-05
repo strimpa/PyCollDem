@@ -5,6 +5,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+	url(r'^facebook/', include('django_facebook.urls')),
+	url(r'^accounts/', include('django_facebook.auth_urls')), #Don't add this line if you use django registration or userena for registration and auth.
+
     # Examples:
     url(r'^admin/$', include(admin.site.urls)),
     url(r'^account/$', 'CollDem.account_views.account'),
@@ -29,9 +32,6 @@ urlpatterns = patterns('',
     url(r'^messages/(?P<msgid>\w+)$', 'CollDem.messageViews.messages'),
 
     url(r'^media/eval/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluation'),
-
-	url(r'^facebook/', include('django_facebook.urls')),
-	url(r'^accounts/', include('django_facebook.auth_urls')), #Don't add this line if you use django registration or userena for registration and auth.
 )
 
 if settings.DEBUG:
