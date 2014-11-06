@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
+import django_facebook
+
 # Meembership
 
 class SocialNetwork(models.Model):
@@ -76,7 +78,7 @@ class CollDemUserManager(BaseUserManager):
 		return theuser
 
 
-class CollDemUser(AbstractBaseUser, PermissionsMixin):
+class CollDemUser(AbstractBaseUser, PermissionsMixin, django_facebook.models.BaseFacebookModel):
 	guid = models.BigIntegerField("Unique ID", primary_key=True, editable=False)
 	first_name = models.CharField("First name", max_length=256, blank=True)
 	last_name = models.CharField("Second name", max_length=256, blank=True)
