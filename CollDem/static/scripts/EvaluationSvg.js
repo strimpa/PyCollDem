@@ -22,6 +22,12 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 			    stroke: "#9B7",
 			    strokeWidth: 1
 			};
+		var toolHandleSensorAttrs = {
+				    fill: "#000",
+				    "fill-opacity": 0,
+				    stroke: "none",
+				    strokeWidth: 1
+				};
 		var toolHandleAttrs = {
 				    fill: "#FFF",
 				    stroke: "#9B7",
@@ -145,15 +151,18 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 			var userEvaluation = evalObj['activeUserEvaluation'];
 			for (var i = 0; i < directions.length; i++) {
 				var handleGroup = canvas.group();
+				var handleSensor = canvas.circle(vertices[i].x, vertices[i].y, 6);
+				handleSensor.attr(toolHandleSensorAttrs);
 				var handle = canvas.circle(vertices[i].x, vertices[i].y, 0);
 				handle.attr(toolHandleAttrs);
-				handle.myDir = directions[i];
-				handle.label = keywords[i];
-				handle.lastPos = vertices[i].offset;
-				handle.myTool = thisCallbackTarget;
-//				handleGroup.add(handle);
-//				handleGroup.add(canvas.text(x+5, y, handle.label));
-				gripGroup.add(handle);
+				handleGroup.myDir = directions[i];
+				handleGroup.label = keywords[i];
+				handleGroup.lastPos = vertices[i].offset;
+				handleGroup.myTool = thisCallbackTarget;
+				handleGroup.add(handleSensor);
+				handleGroup.add(handle);
+//				handleGroup.add(canvas.text(vertices[i].x+5, vertices[i].y, handleGroup.label));
+				gripGroup.add(handleGroup);
 				handles.push(handle);
 
 				moveFn = function(dx, dy, x, y){
@@ -180,10 +189,17 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 					var handleTool = thisCallbackTarget;
 					conn.sendEvaluation(msgID, evalList, this.myTool.reset);
 				};
-				handle.drag(moveFn, startFn, endFn);
-				handle.hover(function(){
-					myLabel.text(this.label);
-				});
+				handleGroup.drag(moveFn, startFn, endFn);
+				handleGroup.hover(
+					function(){
+						myLabel.animate({"color": "rgba(0,0,0,1)"}, 100)
+						myLabel.text(this.label);
+					},
+					function(){
+						myLabel.animate({"color": "rgba(0,0,0,0)"}, 1000)
+						myLabel.text("");
+					}
+				);
 			};
 		}
 

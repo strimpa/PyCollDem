@@ -83,6 +83,8 @@ $ = require(
 
 	function renderMsg(parent, msg, depth, myAnswerCount)
 	{
+		var heightBeforeFill = parent.css("height");
+
 		var msgID = msg['id'];
 		var msgHolder = ui.div(parent, {renderBorder:false, id:"msgHolder"});
 		var msgDiv = ui.renderMessage(msgHolder, msg, depth>0);
@@ -173,6 +175,13 @@ $ = require(
 			if(undefined!=answerCount)
 				answerCount.local ++;
 		}
+		// getting height, setting to 0 and then expandding and deleting.
+		var height = parent.css("height");
+//		console.log(msgID+" - old:"+heightBeforeFill+", new:"+height);
+		parent.css("height", "0px");
+		parent.animate({height:height}, 1000, "swing", function(){
+			parent.css("height", "auto")
+		});			
 
 		if(undefined!=answerCount)
 			answerCount.global += myAnswerCount.global;

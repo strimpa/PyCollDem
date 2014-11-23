@@ -66,7 +66,8 @@ def home(request, urlMsgId=""):
 		'entermsg_form'			: entermsg_form, 
 		'message_formset'		: message_formset, 
 		'no_message_selected'	: urlMsgId=="",
-		'urlMsgId' 				: urlMsgId
+		'urlMsgId' 				: urlMsgId,
+		'title'					: " 3== Pitchf.org --"
 		}, 
 		context_instance=RequestContext(request))
 
