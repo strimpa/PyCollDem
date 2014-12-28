@@ -19,7 +19,7 @@ $ = require(
 	// globals
 	///////////////////////////////////////////////////////////////////////
 	// constants
-	var max_depth = 2;
+	var max_depth = 1;
 	var csrftoken = $.cookie('csrftoken');
 	// jquery extensions
 	$.exists = function(selector){return ($(selector).length > 0);}
@@ -162,9 +162,8 @@ $ = require(
 
 		var myAnswerCount = {'local':0, 'global':0};
 
-		if(result.length<=0)
-			parent.append("No answers.");
-
+		// if(result.length<=0)
+		// 	parent.append("No answers.");
 		if(undefined!=answerCount)
 			answerCount.local = 0;
 
@@ -175,14 +174,6 @@ $ = require(
 			if(undefined!=answerCount)
 				answerCount.local ++;
 		}
-		// getting height, setting to 0 and then expandding and deleting.
-		var height = parent.css("height");
-//		console.log(msgID+" - old:"+heightBeforeFill+", new:"+height);
-		parent.css("height", "0px");
-		parent.animate({height:height}, 1000, "swing", function(){
-			parent.css("height", "auto")
-		});			
-
 		if(undefined!=answerCount)
 			answerCount.global += myAnswerCount.global;
 	}
