@@ -12,25 +12,33 @@ define(
 		jAjaxRequest.done(func);
 	}
 
-	getMessagesFromUser = function(userID, func)
+	getMessagesFromUser = function(userID, offset, func)
 	{
 		var theurl = "/messages/author/"+userID;
-		var serverdata = {};
+
+		if(offset==null)
+			offset = 0;
+		var serverdata = {offset:offset};
 
 		sendAjax({
 			url:theurl, 
-			data:serverdata
+			data:serverdata,
+			type:'POST'
 		}, func);
 	}
 
-	getMessagesForUser = function(userID, func)
+	getMessagesForUser = function(userID, offset, func)
 	{
 		var theurl = "/messages/"+userID;
-		var serverdata = {};
+
+		if(offset==null)
+			offset = 0;
+		var serverdata = {offset:offset};
 
 		sendAjax({
 			url:theurl, 
-			data:serverdata
+			data:serverdata,
+			type:'POST'
 		}, func);
 	}
 
@@ -45,25 +53,33 @@ define(
 		}, func);
 	}
 
-	getMessageWithId = function(msgID, func)
+	getMessageWithId = function(msgID, offset, func)
 	{
 		var theurl = "/messages/"+msgID;
-		var serverdata = {};
+
+		if(offset==null)
+			offset = 0;
+		var serverdata = {offset:offset};
 
 		sendAjax({
 			url:theurl, 
-			data:serverdata
+			data:serverdata,
+			type:'POST'
 		}, func);
 	}
 
-	getAnswerTo = function(msgID, func)
+	getAnswersTo = function(msgID, offset, func)
 	{
-		var theurl = "/messages/answer/"+msgID;
-		var serverdata = {};
+		var theurl = "/messages/answers/"+msgID;
+
+		if(offset==null)
+			offset = 0;
+		var serverdata = {offset:offset};
 
 		sendAjax({
 			url:theurl, 
-			data:serverdata
+			data:serverdata,
+			type:'POST'
 		}, func);
 	}
 

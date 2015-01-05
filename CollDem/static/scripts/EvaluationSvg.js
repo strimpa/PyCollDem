@@ -30,7 +30,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				};
 		var toolHandleAttrs = {
 				    fill: "#FFF",
-				    stroke: "#9B7",
+				    stroke: "#765",
 				    strokeWidth: 1
 				};
 

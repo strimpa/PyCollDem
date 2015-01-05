@@ -29,11 +29,18 @@ def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 		messagesToShow = Message.objects.filter(visibility="PUBLIC", answer_to_id=answer_to)
 
 	messagesToShow = messagesToShow.order_by('created_at')
+	completeDataLength = len(messagesToShow)
+
+	if 'offset' in request.POST:
+		lowerlimit = int(request.POST['offset'])
+		upperLimit = lowerlimit+2
+		messagesToShow = messagesToShow[lowerlimit:upperLimit]
 
 	data = []
 	if len(messagesToShow) > 0: 
 		for msg in messagesToShow:
 			msg.requestUser = request.user
+			msg.completeDataLength = completeDataLength
 			messageJsonObj = json.dumps(msg, cls=CollDemEncoder)
 			data.append(messageJsonObj)
 

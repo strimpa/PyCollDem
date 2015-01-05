@@ -25,7 +25,7 @@ $ = require(
 	$.exists = function(selector){return ($(selector).length > 0);}
 
 
-	function renderAnswers(msgID, answerHolder, depth, myAnswerCount)
+	function renderAnswers(msgID, answerHolder, depth)
 	{
 		var listID = "answers_"+msgID;
 		if($.exists("#"+listID))
@@ -37,10 +37,11 @@ $ = require(
 		else
 		{
 			var answerListHolder = ui.div(answerHolder, {renderBorder:false, id:listID });
-			conn.getAnswerTo(msgID, function(result){
-				renderMsgCB(result, answerListHolder, depth+1, myAnswerCount);
-				ui.insertAnswerCount(msgID, myAnswerCount.local);
-			});
+			function endFunc(datalength)
+			{
+				ui.insertAnswerCount(msgID, datalength);
+			}
+			renderMsgCB(conn.getAnswersTo, msgID, endFunc, answerListHolder, depth+1);
 		}
 	}
 
@@ -49,7 +50,9 @@ $ = require(
 		var replyID = "replyForm_"+msgID;
 		if($.exists("#"+replyID))
 		{
-			$("#"+replyID).remove();
+			$("#"+replyID).animate({height:"0px"}, 500, function(){
+				$("#"+replyID).remove();
+			});
 		}
 		else
 		{
@@ -64,54 +67,36 @@ $ = require(
 		}
 	}
 
-	function countAnswers(result, answerCount)
-	{
-		var myAnswerCount = {'local':0, 'global':0};
-		answerCount.local = 0;
-		for(msgIndex in result)
-		{
-			var msg = result[msgIndex];
-			var msgID = msg['id'];
-			conn.getAnswerTo(msgID, function(result){
-				countAnswers(result, myAnswerCount);
-				if(undefined!=answerCount)
-					answerCount.global += myAnswerCount.local;
-			});
-			answerCount.local++;
-		}
-	}
-
-	function renderMsg(parent, msg, depth, myAnswerCount)
+	function renderMsg(parent, msg, depth)
 	{
 		var heightBeforeFill = parent.css("height");
 
 		var msgID = msg['id'];
-		var msgHolder = ui.div(parent, {renderBorder:false, id:"msgHolder"});
-		var msgDiv = ui.renderMessage(msgHolder, msg, depth>0);
+		var msgHolder = ui.div(parent, {renderBorder:true, id:"msgHolder"});
+		var msgDiv = ui.renderMessage(msgHolder, msg);//, depth>0);
 		var answerHolder = ui.div(msgHolder, {renderBorder:false, boxDisplay:true, id:"answerHolder"});
 
 		if(depth<max_depth)
 		{
-			renderAnswers(msgID, answerHolder, depth, myAnswerCount);
+			renderAnswers(msgID, answerHolder, depth);
 		}
 		else
 		{
-			var answerCB = function(result){
-				countAnswers(result, myAnswerCount);
-				ui.insertAnswerCount(msgID, myAnswerCount.local);
-			};
-			conn.getAnswerTo(msgID, answerCB);
+			var offset = 0;
+			conn.getAnswersTo(msgID, offset, function(result){
+				ui.insertAnswerCount(msgID, result.length);
+			});
 		}
 
 		msgDiv.find("#expand").click(function(result){
-			renderAnswers(msgID, answerHolder, depth, myAnswerCount);
+			renderAnswers(msgID, answerHolder, depth);
 		});
 		msgDiv.find("#reply").click(function(result){
 			renderAnswerForm(msgID, answerHolder);
 		});
 		msgDiv.find("#delete").click(function(result){
 			ui.querybox("You sure?", function(){
-				var parentAnswerCount = {'local':0, 'global':0};
+				var parentAnswerCount = 0;
 				var parentAnswerBox = parent.parents(".answerBox").first();
 				var parentMsgId = parentAnswerBox.prev().attr("message_id");
 				console.log("parent msg id:"+parentMsgId);
@@ -145,37 +130,50 @@ $ = require(
 			'csrfmiddlewaretoken'	: csrfVal
 		};
 
-		var myAnswerCount = {'local':0, 'global':0};
 		var answerDiv = form.parents(".answerBox").first();
 
 		conn.getAnswerForm(function(result)
 		{
 			answerDiv.empty();
-			renderAnswers(msgID, answerDiv, 1, myAnswerCount);
+			renderAnswers(msgID, answerDiv, 1);
 		}, formData);
 	}
 
-	function renderMsgCB(result, parent, depth, answerCount)
+	function renderMsgCB(querySetFunc, param, endFunc, parent, depth, currentLimit)
 	{
 		if(depth==null)
 			depth = 0
 
-		var myAnswerCount = {'local':0, 'global':0};
+		if(null==currentLimit)
+			currentLimit= 0;
 
-		// if(result.length<=0)
-		// 	parent.append("No answers.");
-		if(undefined!=answerCount)
-			answerCount.local = 0;
+		var completeDataLength = 0;
 
-		for(msgIndex in result)
-		{
-			var msg = result[msgIndex];
-			renderMsg(parent, msg, depth, myAnswerCount);
-			if(undefined!=answerCount)
-				answerCount.local ++;
-		}
-		if(undefined!=answerCount)
-			answerCount.global += myAnswerCount.global;
+		querySetFunc(param, currentLimit, function(result){
+
+			for(msgIndex in result)
+			{
+				var msg = result[msgIndex];
+				if('completeDataLength' in msg)
+				{ 
+					completeDataLength = parseInt(msg['completeDataLength'])
+				}
+				renderMsg(parent, msg, depth);
+			}
+
+			if(endFunc != null)
+				endFunc(completeDataLength);
+
+			var newOffset = currentLimit+result.length;
+			if(completeDataLength>newOffset)
+			{
+				var loadButton = ui.renderLoadButton(parent, newOffset);
+				loadButton.click(function(result){
+					renderMsgCB(querySetFunc, param, endFunc, parent, depth, newOffset);
+					loadButton.remove();
+				});
+			}
+		});
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -197,18 +195,15 @@ $ = require(
 	if(messages.length)
 	{
 		console.log("messages:"+messages);
+		var querySetFunc = conn.getMessagesForUser;
+		var param = userID;
+		var depth = 0;
 		if(undefined!=urlMsgId && ""!=urlMsgId)
 		{
-			conn.getMessageWithId(urlMsgId, function(result){
-				renderMsgCB(result, messages);
-			});
+			querySetFunc = conn.getMessageWithId;
+			param = urlMsgId;
 		}
-		else
-		{
-			conn.getMessagesForUser(userID, function(result){
-				renderMsgCB(result, messages);
-			});
-		}
+		renderMsgCB(querySetFunc, param, null, messages);
 	}
 
 	$("#followButton").each(function(){

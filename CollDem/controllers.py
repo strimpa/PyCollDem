@@ -2,6 +2,7 @@ import re, random
 
 from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -24,9 +25,10 @@ class MessageController:
 		if MessageController.isIdUnique(savestring):
 			return savestring
 
-		savestring += "_"+msg.author.username[:20]
-		if MessageController.isIdUnique(savestring):
-			return savestring
+		if msg.author!=None and msg.author.is_authenticated():
+			savestring += "_"+msg.author.username[:20]
+			if MessageController.isIdUnique(savestring):
+				return savestring
 
 		savestring += "_"
 		savestring += str(int(random.random()*100000000))
@@ -53,7 +55,7 @@ class MessageController:
 	@classmethod
 	def createMessage(cls, answer_to, header, text, request, visValue):
 		userid = None
-		if request.user.is_authenticated:
+		if request.user.is_authenticated():
 			userid = request.user.guid
 
 		new_msg = Message(

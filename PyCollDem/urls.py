@@ -26,7 +26,7 @@ urlpatterns = patterns('',
    	url(r'^messages/evaluate/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluate'),
 
     #message queries
-    url(r'^messages/answer/(?P<answer_to>\w+)$', 'CollDem.messageViews.messages'),
+    url(r'^messages/answers/(?P<answer_to>\w+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/author/(?P<authorid>\d+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/(?P<userid>\d+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/(?P<msgid>\w+)$', 'CollDem.messageViews.messages'),

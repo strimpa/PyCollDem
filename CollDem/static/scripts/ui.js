@@ -15,19 +15,17 @@ define(
 		messageDiv.append("<div class='evaluationGroup innerContentBorder'><span id='evaluation' /><div id='evalLabel_"+msg['id']+"'></div>");
 		
 		// message content
-		var table = $("<table/>");
-		table.append("<tr><td><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></td></tr>");
-		table.append("<tr><td>"+msg.text+"</td></tr>");
+		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
+		messageDiv.append("<p>"+msg.text+"</p>");
+		
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
 		if(msg['can_delete'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
 
-		table.append($("<tr/>").append($("<td/>").append(answerActions)));
-
-		messageDiv.append(table);
+		messageDiv.append(answerActions);
 
 		// style things
-		var classString = "messageDimensions innerContentBorder";
+		var classString = "messageDimensions";
 		if(isAnswer==true)
 			classString += " answerDiv ";
 		messageDiv.attr("class", classString);
@@ -43,10 +41,25 @@ define(
 		return messageDiv;
 	}
 
+	renderLoadButton = function(parentNode, offset)
+	{
+		var button = $("<input type='button' value='Load more messages >>' />");
+		parentNode.append(button);
+		return button;
+	}
+
 	renderAnswerForm = function(parentNode, answerHtml)
 	{
 		var formDiv = $(answerHtml);
 		parentNode.append(formDiv);
+
+		// getting height, setting to 0 and then expandding and deleting.
+		var height = formDiv.css("height");
+		formDiv.css("height", "0px");
+		formDiv.animate({height:height}, 300, "swing", function(){
+			formDiv.css("height", "auto")
+		});			
+
 		return formDiv;
 	}
 
@@ -69,7 +82,7 @@ define(
 		{
 			if(undefined!=params.id)
 				theDiv.attr("id", params.id);
-			if(true==params.renderBorder && !answerLine)
+			if(true==params.renderBorder)
 				classString += " innerContentBorder";
 			if(true==params.boxDisplay)
 				classString += " answerBox";

@@ -18,14 +18,19 @@ class CollDemEncoder(JSONEncoder):
 
 		if isinstance(obj, Message):
 			controller = MessageController(obj)
+			userName = 'Anonymous'
+			if obj.author!=None:
+				userName = obj.author.username
+				
 			returnObject = {
 				'id':obj.guid,
-				'author':obj.author.username,
+				'author':userName,
 				'avatar':CollDemUser.objects.get_pic(obj.author),
 				'header':obj.header, 
 				'text':obj.text,
 				'can_delete':(obj.author == obj.requestUser),
-				'evaluation':controller.getEvaluation(obj.requestUser)
+				'evaluation':controller.getEvaluation(obj.requestUser),
+				'completeDataLength':obj.completeDataLength
 			}
 			# for evalSet in obj.user_evaluation.all():
 			# 	returnObject['evaluation'].append(self.default(evalSet))
