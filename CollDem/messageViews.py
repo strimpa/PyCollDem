@@ -28,7 +28,7 @@ def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 	else:
 		messagesToShow = Message.objects.filter(visibility="PUBLIC", answer_to_id=answer_to)
 
-	messagesToShow = messagesToShow.order_by('created_at')
+	messagesToShow = messagesToShow.order_by('-created_at')
 	completeDataLength = len(messagesToShow)
 
 	if 'offset' in request.POST:
