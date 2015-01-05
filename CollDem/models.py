@@ -27,10 +27,10 @@ class CollDemUserManager(BaseUserManager):
 	def valid_user(self):
 		return isinstance(self.the_user, CollDemUser)
 
-	def get_pic(self, user=None):
+	def get_pic(self, user):
 		"logic to access the picture or get default one if undefined"
-		if None!=user:
-			self.set_user(user)
+		self.set_user(user)
+		
 		if 	not self.valid_user() or \
 			not user.is_authenticated() or \
 			not self.the_user.pic or \
