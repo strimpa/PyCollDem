@@ -32,6 +32,7 @@ class CollDemUserManager(BaseUserManager):
 		if None!=user:
 			self.set_user(user)
 		if 	not self.valid_user() or \
+			not user.is_authenticated() or \
 			not self.the_user.pic or \
 			None==self.the_user.pic.url:
 			return settings.MEDIA_URL+'/profile_pics/default_pic.gif'
