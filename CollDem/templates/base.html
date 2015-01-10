@@ -1,7 +1,8 @@
 {% load staticfiles %}
+
 <html>
 	<head>
-		<title>{% block title %}{% endblock %}</title>
+		<title>3== Pitchf.org == {{ title }} ==&euro;</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'Site.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'scripts/lib/jquery-ui.min.css' %}" />
 		<script type="text/javascript">
@@ -20,21 +21,35 @@
 	            <div id="title">
 	                <a href="/"><img width="100px" src="{% static 'images/logo.png' %}"></a>
 	            </div>
-	            <div id="logindisplay" class="contentField">
+	            <div id="logindisplay" class="headerField">
 	                {% include "logOnDisplay.html" %}
 	            </div>
 	            <br style="clear:both;" />
 	        </header>
 	        <section id="main">
+				<H1>{{title}} {% block follow_button %}{% endblock %}</H1>
+				<div id="toolBar" class="headerField">
+		            <nav>
+		                <ul id="menu">
+							<li><a href="/">Home</a></li> | 
+							<li><a href="/notifications/">Notifications<span id="notificationCount"></span></a></li>
+							{% if entermsg_form %} | 
+							<li>
+								<input type="button" id="createMessageExpand" value="Create new message">
+								<div id="createMessage" class="innerContentBorder">
+									<form action="/" method="POST">{% csrf_token %}
+									{{ entermsg_form.as_p }}
+									<input type="submit" value="submit" />
+									</form>
+								</div>
+							</li>
+							{% endif %}
+		                </ul>
+		            </nav>
+				</div>
 				{% block content %}{% endblock %}
 	        </section>
-	        <footer class="contentField">
-	            <nav>
-	                <ul id="menu">
-	                    <li>Home</li>
-	                    <li>About</li>
-	                </ul>
-	            </nav>
+	        <footer class="headerField">
 	        </footer>
 	    </div>
 

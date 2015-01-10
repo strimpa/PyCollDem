@@ -124,5 +124,12 @@ define(
 		}, func);
 	}
 
+	getNotificationCount = function(func)
+	{
+		sendAjax({
+			url:"/notifications/json/",
+		}, func);
+	}
+
 	return this;
 });

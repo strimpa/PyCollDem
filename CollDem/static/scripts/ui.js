@@ -1,5 +1,5 @@
 define(
-	['jqueryui', 'jCookie', 'EvaluationSvg'], function(jui, jCookie, evalImage)
+	['jqueryui', 'jCookie', 'EvaluationSvg', 'snap'], function(jui, jCookie, evalImage, snap)
 {
 	// helpers
 
@@ -43,7 +43,7 @@ define(
 
 	renderLoadButton = function(parentNode, offset)
 	{
-		var button = $("<input type='button' value='Load more messages >>' />");
+		var button = $("<input type='button' id='loadbutton' value='Load more messages >>' />");
 		parentNode.append(button);
 		return button;
 	}
@@ -119,6 +119,19 @@ define(
 	{
 		var image = evalImage.CreateEvaluationImage(evalObj, msgID, conn);
 		parent.append(image.node);
+	}
+
+	renderUpdateCircle = function(parent, numberUpdates)
+	{
+		var canvas = Snap(15,15);
+		var circle = canvas.circle(7,7,7);
+		circle.attr({
+			    fill: "#d00",
+			    stroke: "none",
+			    strokeWidth: 0
+			});
+		var text = canvas.text(2,10,numberUpdates);
+		parent.append(canvas.node);
 	}
 
 	return this;

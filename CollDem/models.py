@@ -90,6 +90,9 @@ class CollDemUser(AbstractBaseUser, PermissionsMixin, django_facebook.models.Bas
 	network_memberships = models.ManyToManyField(SocialNetwork, through='NetworkMembership')
 	connections = models.ManyToManyField('CollDemUser', verbose_name="Connections")
 
+	last_activity = models.DateTimeField("Last time the user interacted with the system.", editable=False, auto_now_add=True)
+	last_update = models.DateTimeField("Last time notifications have been queried.", editable=False, auto_now_add=True)
+
 	#AbtractBaseUser contract  
 	is_staff = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=False)

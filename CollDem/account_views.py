@@ -30,7 +30,9 @@ def account(request):
 	return render(request, "account.html", {
 		'profile_form':profileForm,
 		'account_form':accountForm,
-		'login_form':LoginForm()})
+		'login_form':LoginForm(),
+		'title': ("Account summary of "+request.user.username)
+		})
 
 def register(request):
 	register_form = RegisterForm();
@@ -100,10 +102,13 @@ def profile(request, userId=None, username=None):
 				found_user = CollDemUser.objects.get(guid=userId)
 				CollDemUser.objects.set_user(found_user)
 			except ObjectDoesNotExist:
-				pass
-
-	image_form = ImageForm()
+				return render(request, "deadend.html", {
+					'warning_text':"No user found with user ID"
+					})
+	
+#	image_form = ImageForm()
 	return render(request, "profile.html", {
 		'user_controller':CollDemUser.objects,
-		'login_form':LoginForm()
+		'login_form':LoginForm(),
+		'title': ("Public profile of "+CollDemUser.objects.the_user.username)
 		})

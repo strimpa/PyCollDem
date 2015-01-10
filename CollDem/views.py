@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser
@@ -9,6 +10,7 @@ from django.forms.models import modelformset_factory
 from CollDem.forms import LoginForm, EnterMessageForm
 from CollDem.models import Message, CollDemUser
 from CollDem.controllers import MessageController
+from CollDem.analytics import notification_list
 
 class LoginError(Exception):
 	def __init__(self, value):
@@ -67,7 +69,7 @@ def home(request, urlMsgId=""):
 		'message_formset'		: message_formset, 
 		'no_message_selected'	: urlMsgId=="",
 		'urlMsgId' 				: urlMsgId,
-		'title'					: " 3== Pitchf.org =="
+		'title'					: ( "Your messages" if user.is_authenticated() else "Public messages")
 		}, 
 		context_instance=RequestContext(request))
 
@@ -76,3 +78,15 @@ def home(request, urlMsgId=""):
 def logout_view(request):
 	logout(request)
 	return redirect("/")
+
+def notification_view(request):
+	notifications = notification_list(request.user)
+
+	request.user.last_update = timezone.now()
+	request.user.save()
+
+	return render(request, 'notifications.html', 
+		{
+		'notifications': notifications,
+		'title' 	   : "Notifications"
+		})

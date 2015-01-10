@@ -206,6 +206,8 @@ $ = require(
 		renderMsgCB(querySetFunc, param, null, messages);
 	}
 
+	//Control event handler setups
+
 	$("#followButton").each(function(){
 		button = $(this);
 		console.log("found a button!"+button);
@@ -219,6 +221,23 @@ $ = require(
 				clicked_button.val("Unfollow");
 				clicked_button.attr("enabled", "true");
 			});
+		});
+	});
+
+	$("#notificationCount").each(function(){
+		var noteDiv = $(this);
+		conn.getNotificationCount(function(result){
+			console.log(result);
+			if(result!="user not authenticated")
+			{
+				var newNotifications = 0;
+				for (var i = result.length - 1; i >= 0; i--) {
+					if('new' in result[i])
+						newNotifications++;
+				};
+				if(newNotifications>0)
+					renderUpdateCircle(noteDiv, newNotifications);
+			}
 		});
 	});
 

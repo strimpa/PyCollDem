@@ -8,7 +8,7 @@ body {
     font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
     margin: 0;
     padding: 0;
-    color: #ded;
+    color: #9B7;
     font-size: 0.8em;
 }
 
@@ -73,6 +73,12 @@ h1 {
     margin: 0;
 }
 
+#main h1
+{
+    margin-left: 10px;
+    margin-bottom: -4px;
+}
+
 h2 {
     padding: 0 0 10px 0;
 }
@@ -118,13 +124,20 @@ header h1, #header h1 {
     text-shadow: 1px 1px 2px #111;
 }
 
-.contentField {
+.headerField {
     border-radius: 8px 0px 0px 8px;
     -webkit-border-radius: 8px 0 0 8px;
     -moz-border-radius: 8px 0 0 8px;
     border-color:#9B7;
     background-color: #01723B;
     padding: 10px;
+    font-family: '616';
+}
+
+.contentColours
+{
+    background-color: #e3eee3;
+    color: #131;
 }
 
 .innerContentBorder{
@@ -177,7 +190,7 @@ footer,
     overflow: hidden;
 }
 
-#createMessageDrawer
+#toolBar
 {
     background-color: #01723b;
     padding:10px;
@@ -196,8 +209,12 @@ footer,
 
 #messages
 {
-    background-color: #e3eee3;
-    color: #131;
+}
+
+/* Particular  control elements */
+#loadbutton
+{
+    margin:5px;
 }
 
 /* Message   
@@ -237,48 +254,15 @@ footer,
 
 /* TAB MENU   
 ----------------------------------------------------------*/
-ul#menu {
-    padding: 0 0 2px;
-    position: relative;
-    margin: 0;
-    text-align: right;
-}
-
 ul#menu li {
     display: inline;
     list-style: none;
 }
 
-ul#menu li#greeting {
-    padding: 10px 20px;
-    font-weight: bold;
-    text-decoration: none;
-    line-height: 2.8em;
-    color: #fff;
-}
-
-ul#menu li a {
-    padding: 10px 20px;
-    font-weight: bold;
-    text-decoration: none;
-    line-height: 2.8em;
-    background-color: #ded;
-    color: #01723b;
-}
-
-ul#menu li a:hover {
-    background-color: #fff;
-    text-decoration: none;
-}
-
-ul#menu li a:active {
-    background-color: #a6e2a6;
-    text-decoration: none;
-}
-
-ul#menu li.selected a {
-    background-color: #fff;
-    color: #000;
+#menu
+{
+    margin: 0px;
+    padding: 0px;
 }
 
 /* FORM LAYOUT ELEMENTS   
