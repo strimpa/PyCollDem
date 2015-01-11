@@ -30,7 +30,8 @@ urlpatterns = patterns('',
     url(r'^notifications/', 'CollDem.views.notification_view'),
 
     #actions
-    url(r'^logout/$', 'CollDem.views.logout_view'),
+    url(r'^login/$', 'CollDem.account_views.login_view'),
+    url(r'^logout/$', 'CollDem.account_views.logout_view'),
     url(r'^answer/$', 'CollDem.messageViews.answer'),
     url(r'^messages/delete/(?P<msgid>\w+)$', 'CollDem.messageViews.delete'),
    	url(r'^messages/evaluate/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluate'),

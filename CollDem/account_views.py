@@ -9,6 +9,54 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ObjectDoesNotExist
+
+def login_view(request):
+	login_form = LoginForm(data=request.POST)
+	if login_form.is_valid():
+		username = login_form.cleaned_data['username']
+		password = login_form.cleaned_data['password']
+
+		try:
+			user = CollDemUser.objects.get(username=username)
+		except ObjectDoesNotExist:
+			return render(request, "deadend.html", {
+							'login_form':LoginForm(),
+							'warning_text':"No user with that name."
+							})
+
+		authenticated_user = authenticate(username=username, password=password)
+		if authenticated_user is None:
+			# no user with that name
+			warning_text = "Wrong password."
+			return render(request, "deadend.html", {
+							'login_form':LoginForm(),
+							'warning_text':warning_text
+							})
+
+		#user isn't activated yet
+		if not authenticated_user.is_active:
+			#user isn't activated yet
+			return render(request, "deadend.html", {
+							'login_form':LoginForm(),
+							'warning_text':"User hasn't been activated yet. Please check your email."
+							})
+
+		# SUCCESS!
+		login(request, authenticated_user)
+		return HttpResponseRedirect('/') # Redirect after POST
+
+	return render(request, "deadend.html", {
+		'login_form':LoginForm(),
+		'warning_text':"Login failed - please try again."
+		})
+
+
+
+def logout_view(request):
+	logout(request)
+	return HttpResponseRedirect("/")
 
 def account(request):
 	profileForm = ProfileForm()
@@ -52,7 +100,9 @@ def register(request):
 
 	return render(request, "register.html", {
 		'register_form':register_form,
-		'login_form':LoginForm()})
+		'login_form':LoginForm(),
+		'title':"Register"
+		})
 
 def follow(request, userId):
 	returnValue = "failed"
@@ -80,16 +130,18 @@ def registerConfirm(request, userId=''):
 	return render(request, "register.html", {
 		'confirmation':True,
 		'confirmation_text':confirmation_text,
-		'login_form':LoginForm()
+		'login_form':LoginForm(),
+		'title':"Register"
 		})
 
-def login(request):
-	loginForm = LoginForm()
-	return render_to_response("login.html", {'login_form':loginForm})
-
 def profile(request, userId=None, username=None):
-	if (None==userId and None==username) or "me"==userId:
+	tisMe = False
+	if (None==userId and None==username) or \
+		"me"==userId or \
+		(None!=userId and userId==request.user.guid) or \
+		(None!=username and username==request.user.username):
 		CollDemUser.objects.set_user(request.user)
+		tisMe = True
 	else:
 		if None!=username:
 			try:
@@ -109,6 +161,7 @@ def profile(request, userId=None, username=None):
 #	image_form = ImageForm()
 	return render(request, "profile.html", {
 		'user_controller':CollDemUser.objects,
+		'tisMe':tisMe,
 		'login_form':LoginForm(),
 		'title': ("Public profile of "+CollDemUser.objects.the_user.username)
 		})

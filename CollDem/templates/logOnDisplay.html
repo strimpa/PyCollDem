@@ -3,7 +3,7 @@
 	<p>Hello {{ user.username }}</p>
 	<p><a href="/account/">Account</a> | <a href="/logout/">Logout</a></p>
 {% else %}
-	<form action="/" method="POST">{% csrf_token %}
+	<form action="/login/" method="POST">{% csrf_token %}
 	{{ login_form.as_p }}
 	<a href="/register/">Register new user</a> | <a href="/forgot_password/">Forgot username/password</a>
 	<input type="submit" value="log on" />

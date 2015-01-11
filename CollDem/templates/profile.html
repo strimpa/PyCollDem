@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
+{% if not tisMe %}
+{{ tisMe }}
 {% block follow_button %}<input id="followButton" userid="{{ user_controller.the_user.guid }}" type="button" value="Follow" />{% endblock %}
+{% endif %}
 
 {% block content %}
 {% if not user_controller.valid_user %}

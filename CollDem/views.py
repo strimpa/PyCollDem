@@ -1,6 +1,5 @@
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
@@ -74,12 +73,13 @@ def home(request, urlMsgId=""):
 		context_instance=RequestContext(request))
 
 
-
-def logout_view(request):
-	logout(request)
-	return redirect("/")
-
 def notification_view(request):
+	if request.user==None or not request.user.is_authenticated():
+		return render(request, "deadend.html", {
+			'login_form':LoginForm(),
+			'warning_text':"User must be logged in to see notifications."
+		})
+
 	notifications = notification_list(request.user)
 
 	request.user.last_update = timezone.now()
