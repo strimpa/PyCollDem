@@ -9,7 +9,7 @@ body {
     margin: 0;
     padding: 0;
     color: #9B7;
-    font-size: 0.8em;
+    font-size: 12px;
 }
 
 @font-face {
@@ -61,8 +61,18 @@ section {
 
 table
 {
-    font-size: 0.8em;
+    font-size: inherit;
     text-align: left;
+}
+
+th
+{
+    font-weight: normal;
+}
+
+table label
+{
+    display: none;
 }
 /* HEADINGS   
 ----------------------------------------------------------*/
@@ -113,7 +123,6 @@ page width. Or, you can specify an exact pixel width. */
 header, #header {
     position: relative;
     margin-bottom: 0px;
-    color: #000;
     padding: 0;
 }
 
@@ -174,6 +183,11 @@ header h1, #header h1 {
     margin: 1px;
 }
 
+.menuBlock
+{
+    display: block;
+}
+
 #main {
     margin-top: 10px;
     margin-left: 10px;
@@ -188,6 +202,11 @@ footer,
     font-size: .9em;
     height: 50px;
 
+}
+
+#messages
+{
+    overflow: hidden;
 }
 
 #createMessage
@@ -297,7 +316,12 @@ input[type="email"] {
     padding: 2px;
     font-size: 0.8em;
     color: #444;
-    width: 200px;
+    width: 150px;
+}
+
+input.watermark
+{
+    color : #999;
 }
 
 select {
@@ -309,7 +333,6 @@ select {
 
 input[type="submit"] {
     font-size: 1em;
-    padding: 5px;
 }
 
 /* TABLE
@@ -352,30 +375,10 @@ div#title {
 #logindisplay {
     float:right;
     background-color: #01723b;
-    font-size: 1.1em;
     display: block;
     text-align: right;
     padding: 10px;
     margin: 0px;
-    color: White;
-}
-#logindisplay::after
-{
-    clear:both;
-}
-#logindisplay a:link {
-    color: white;
-    text-decoration: underline;
-}
-
-#logindisplay a:visited {
-    color: white;
-    text-decoration: underline;
-}
-
-#logindisplay a:hover {
-    color: white;
-    text-decoration: none;
 }
 
 /* Styles for validation helpers

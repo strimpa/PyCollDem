@@ -241,6 +241,36 @@ $ = require(
 		});
 	});
 
+	$("table input").each(function(){
+		var ID = $(this).attr("id");
+		var labelText = $("label[for="+ID+"]").text();
+		var actualType = $(this).attr("type");
+		if($(this).val().length==0)
+		{
+			$(this).val(labelText);
+			$(this).attr("type", "text");
+			$(this).addClass("watermark");
+		}
+
+		$(this).focus(function(){
+			if($(this).val()==labelText)
+			{
+				$(this).removeClass("watermark");
+				$(this).attr("type", actualType);
+				$(this).val("");
+			}
+		});
+
+		$(this).blur(function(){
+			if($(this).val().length==0)
+			{
+				$(this).val(labelText);
+				$(this).attr("type", "text");
+				$(this).addClass("watermark");
+			}
+		});
+	});
+
 	$(function(){
 		var messageDrawerState = true;
 		$("#createMessage").css("height", "0px");
