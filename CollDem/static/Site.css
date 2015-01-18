@@ -138,9 +138,9 @@ header h1, #header h1 {
 }
 
 .headerField {
-    border-radius: 8px 0px 0px 8px;
-    -webkit-border-radius: 8px 0 0 8px;
-    -moz-border-radius: 8px 0 0 8px;
+    border-radius: 5px 0px 0px 5px;
+    -webkit-border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
     border-color:#9B7;
     background-color: #01723B;
     padding: 10px;
@@ -156,9 +156,9 @@ header h1, #header h1 {
 .innerContentBorder{
     padding-left: 10px;
     border-width: 0px 0px 0px 1px;
-    border-radius: 8px 8px 8px 8px;
-    -webkit-border-radius: 8px 8px 8px 8px;
-    -moz-border-radius: 8px 8px 8px 8px;
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
     border-style: solid;
 }
 
@@ -275,6 +275,11 @@ footer,
     margin:2px;
     width:80px;
     height:62px;
+}
+
+#msgHolder
+{
+    margin-bottom: 5px;
 }
 
 /* TAB MENU   

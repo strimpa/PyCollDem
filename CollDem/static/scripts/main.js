@@ -241,33 +241,57 @@ $ = require(
 		});
 	});
 
+	///////////////////////////////////////////////////////////////////////////////////
+	// Form watermark logic
+
 	$("table input").each(function(){
 		var ID = $(this).attr("id");
-		var labelText = $("label[for="+ID+"]").text();
+		var labelText = $(this).parents("table").find("label[for="+ID+"]").text();
 		var actualType = $(this).attr("type");
-		if($(this).val().length==0)
-		{
-			$(this).val(labelText);
-			$(this).attr("type", "text");
-			$(this).addClass("watermark");
-		}
-
-		$(this).focus(function(){
+		this.clearWaterMark = function(){
 			if($(this).val()==labelText)
 			{
 				$(this).removeClass("watermark");
 				$(this).attr("type", actualType);
 				$(this).val("");
 			}
-		});
-
-		$(this).blur(function(){
+		}
+		this.addWaterMark = function(){
 			if($(this).val().length==0)
 			{
 				$(this).val(labelText);
 				$(this).attr("type", "text");
 				$(this).addClass("watermark");
 			}
+		}
+
+		if( $(this).attr("type")=="file" ||
+			$(this).attr("type")=="hidden" )
+			return;
+
+		$(this).focus(function(){
+			this.clearWaterMark();
+		});
+
+		$(this).blur(function(){
+			this.addWaterMark();
+		});
+
+		this.addWaterMark();
+	});
+
+	$("input[type=submit]").each(function(){
+		$(this).click(function(){
+			$(this).parent().find("input").each(function(){
+				console.log("found:"+$(this).val());
+				if(this.clearWaterMark!=null)
+				{
+					this.clearWaterMark();
+					console.log("cleared!");
+				}
+				else
+					console.log("not clearable!");
+			});
 		});
 	});
 
