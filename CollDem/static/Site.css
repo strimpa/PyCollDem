@@ -157,6 +157,7 @@ header h1, #header h1 {
 {
     max-width: 800px;
     min-width: 300px;
+    overflow:auto;
 }
 
 .answerBox

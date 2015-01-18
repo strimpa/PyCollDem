@@ -194,7 +194,6 @@ $ = require(
 	var messages = $("#messages");
 	if(messages.length)
 	{
-		console.log("messages:"+messages);
 		var querySetFunc = conn.getMessagesForUser;
 		var param = userID;
 		var depth = 0;
@@ -227,7 +226,6 @@ $ = require(
 	$("#notificationCount").each(function(){
 		var noteDiv = $(this);
 		conn.getNotificationCount(function(result){
-			console.log(result);
 			if(result!="user not authenticated")
 			{
 				var newNotifications = 0;
@@ -236,7 +234,9 @@ $ = require(
 						newNotifications++;
 				};
 				if(newNotifications>0)
+				{
 					renderUpdateCircle(noteDiv, newNotifications);
+				}
 			}
 		});
 	});

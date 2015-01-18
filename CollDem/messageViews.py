@@ -1,6 +1,7 @@
 import json
 import string
 
+from django.utils import timezone
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
@@ -11,8 +12,12 @@ from forms import AnswerForm
 from CollDem.controllers import MessageController
 from django.core.exceptions import ObjectDoesNotExist
 
+global_loading_step = 8
+answer_loading_step = 3
+
 def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 	messagesToShow = None
+	is_answerlist_query = (answer_to!=None)
 	if msgid!=None:
 		messagesToShow = (Message.objects.filter(guid=msgid))
 	elif authorid!=None:
@@ -33,7 +38,9 @@ def messages(request, authorid=None, userid=None, answer_to=None, msgid=None):
 
 	if 'offset' in request.POST:
 		lowerlimit = int(request.POST['offset'])
-		upperLimit = lowerlimit+2
+		upperLimit = lowerlimit+global_loading_step
+		if is_answerlist_query:
+			upperLimit = lowerlimit+answer_loading_step
 		messagesToShow = messagesToShow[lowerlimit:upperLimit]
 
 	data = []
@@ -110,6 +117,7 @@ def evaluate(request, msgid):
 			evaluation.save()
 		except ObjectDoesNotExist:
 			evaluation = Evaluation.objects.create(name=postVarKey, factor=float(postVarVal), evaluation_set=evalSet)
+	evalSet.updated_at = timezone.now()
 	evalSet.save()
 
 	data = json.dumps(msgController.getEvaluation(request.user))

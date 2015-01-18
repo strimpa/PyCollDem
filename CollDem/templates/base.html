@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'scripts/lib/jquery-ui.min.css' %}" />
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"> 
 		<link media="only screen and (max-device-width: 480px)"
-		    href="layout/Site_mobile.css" type="text/css" rel="stylesheet" /> 
+		    href="{% static 'Site_mobile.css' %}" type="text/css" rel="stylesheet" /> 
 		<script type="text/javascript">
 			userID = 
 			{% if user.is_authenticated %}
@@ -17,7 +17,7 @@
 			{% endif %}
 		</script>
 		<script data-main="{% static 'scripts/main' %}" src="{% static 'scripts/require.js' %}"></script>
-	</head>o
+	</head>
 	<body>
 	    <div class="page">
 	        <header>

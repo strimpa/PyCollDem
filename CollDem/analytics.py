@@ -11,13 +11,63 @@ from django.forms import Textarea
 from CollDem.lang import lang
 from CollDem.models import CollDemUser
 
+#Helper functions
+
 def create_user_link_string(users):
 	res = ""
 	for user in users:
 		if res!="":
 			res += ", "
-		res += ('<a href="/profile/'+str(user.guid)+'">'+user.username+"</a>")
+		if user != None:
+			res += ('<a href="/profile/'+str(user.guid)+'">'+user.username+"</a>")
+		else:
+			res += ('An anonymous user')
 	return res
+
+def searchMessages(notifications, message, answer_to, user, answers, notification_text):
+	repliers = []
+	new_repliers = []
+	for reply in answers:
+		if reply.created_at > message.created_at and reply.author!=user:
+			if reply.created_at < user.last_update:
+				if not reply.author in repliers:
+					repliers.append(reply.author)
+			else: 
+				if not reply.author in new_repliers:
+					new_repliers.append(reply.author)
+
+	notification_obj = {}
+	if len(new_repliers)>0:
+		notification_obj['text'] = ( lang(notification_text, create_user_link_string(new_repliers), answer_to.guid))
+		notification_obj['new'] = True
+	if len(repliers)>0:
+		notification_obj['text'] = (lang(notification_text, create_user_link_string(repliers), answer_to.guid))
+	if 'text' in notification_obj:
+		notifications.append(notification_obj)
+
+def searchEvaluations(notifications, message, user, notification_text):
+	evaluators = []
+	new_evaluators = []
+	for evaluation in message.user_evaluation.all():
+		evaluator = evaluation.evaluator
+		if evaluation.updated_at > message.created_at and evaluator!=user:
+			if evaluation.updated_at < user.last_update:
+				if not evaluator in evaluators:
+					evaluators.append(evaluator)
+			else: 
+				if not evaluator in new_evaluators:
+					new_evaluators.append(evaluator)
+
+	notification_obj = {}
+	if len(new_evaluators)>0:
+		notification_obj['text'] = ( lang(notification_text, create_user_link_string(new_evaluators), message.guid))
+		notification_obj['new'] = True
+	if len(evaluators)>0:
+		notification_obj['text'] = (lang(notification_text, create_user_link_string(evaluators), message.guid))
+	if 'text' in notification_obj:
+		notifications.append(notification_obj)
+
+#controller functions
 
 def notification_list(user):
 	notifications = []
@@ -25,46 +75,10 @@ def notification_list(user):
 	for message in user.my_messages.all():
 		#replies to messages we replied to
 		if message.answer_to != None:
-			sibling_repliers = []
-			new_sibling_repliers = []
-			for sibling_reply in message.answer_to.answers.all():
-				if sibling_reply.created_at > message.created_at and sibling_reply.author!=user:
-					if sibling_reply.created_at < user.last_update:
-						if not sibling_reply.author in sibling_repliers:
-							sibling_repliers.append(sibling_reply.author)
-					else: 
-						if not sibling_reply.author in new_sibling_repliers:
-							new_sibling_repliers.append(sibling_reply.author)
+			searchMessages(notifications, message, message.answer_to, user, message.answer_to.answers.all(), 'UPDATE_SIBLING_REPLY')
 
-			notification_obj = {}
-			if len(new_sibling_repliers)>0:
-				notification_obj['text'] = ( lang("UPDATE_SIBLING_REPLY", create_user_link_string(new_sibling_repliers), message.answer_to.guid))
-				notification_obj['new'] = True
-			if len(sibling_repliers)>0:
-				notification_obj['text'] = (lang("UPDATE_SIBLING_REPLY", create_user_link_string(sibling_repliers), message.answer_to.guid))
-			if 'text' in notification_obj:
-				notifications.append(notification_obj)
-
-		repliers = []
-		new_repliers = []
-		for reply in message.answers.all():
-			if reply.created_at > message.created_at and reply.author!=user:
-				if reply.created_at < user.last_update:
-					if not reply.author in repliers:
-						repliers.append(reply.author)
-				else:
-					if not reply.author in new_repliers:
-						new_repliers.append(reply.author)
-
-		notification_obj = {}
-		if len(new_repliers)>0:
-			notification_obj['text'] = ( lang("UPDATE_REPLY", create_user_link_string(new_repliers), message.guid))
-			notification_obj['new'] = True
-		if len(repliers)>0:
-			notification_obj['text'] = (lang("UPDATE_REPLY", create_user_link_string(repliers), message.guid))
-		if 'text' in notification_obj:
-			notifications.append(notification_obj)
-
+		searchMessages(notifications, message, message, user, message.answers.all(), 'UPDATE_REPLY')
+		searchEvaluations(notifications, message, user, 'UPDATE_EVALLUATION')
 	return notifications
 
 

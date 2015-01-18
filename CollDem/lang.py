@@ -6,7 +6,8 @@ values = {
 	'REG_CONFIRMATION_MAIL': 'Hi %0 Please confirm your membership by clicking on this link: http://www.pitchf.org/register/confirm/%1',
 	'REG_CONFIRMATION_FAILED': 'The user with the ID could not be found. You might already be activated, or please try registering again.',
 	'UPDATE_SIBLING_REPLY': '%0 also replied on message <a href="/%1">%1</a> that you replied to before.',
-	'UPDATE_REPLY': '%0 replied on your message <a href="/%1">%1</a>.'
+	'UPDATE_REPLY': '%0 replied on your message <a href="/%1">%1</a>.',
+	'UPDATE_EVALLUATION' : '%0 evaluated your message <a href="/%1">%1</a>.'
 }
 
 args = []

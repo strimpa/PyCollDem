@@ -130,7 +130,19 @@ define(
 			    stroke: "none",
 			    strokeWidth: 0
 			});
-		var text = canvas.text(2,10,numberUpdates);
+		if(numberUpdates>9)
+		{
+			canvas.image("static/images/full.gif", 3,4,8,8);
+		}
+		else
+		{
+			var text = canvas.text(6,11,numberUpdates);
+			text.attr({
+	//		  fontFamily: 'Source Sans Pro',
+			  fontSize: 9,
+			  textAnchor: 'middle'
+			});
+		}
 		parent.append(canvas.node);
 	}
 
