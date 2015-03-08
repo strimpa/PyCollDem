@@ -3,16 +3,19 @@
 define(
 	function()
 {
-	function sendAjax(requestData, func)
+	function sendAjax(requestData, func, errorFunc)
 	{
+		requestData['timeout'] = 5000;
 		var jAjaxRequest = $.ajax(requestData);
 		jAjaxRequest.fail(function(request, errorstate, errormsg){
 			console.log("error:"+errormsg);
+			if(errorFunc!=null)
+				errorFunc(errormsg);
 		});
 		jAjaxRequest.done(func);
 	}
 
-	getMessagesFromUser = function(userID, offset, func)
+	getMessagesFromUser = function(userID, offset, func, errorFunc)
 	{
 		var theurl = "/messages/author/"+userID;
 
@@ -24,10 +27,10 @@ define(
 			url:theurl, 
 			data:serverdata,
 			type:'POST'
-		}, func);
+		}, func, errorFunc);
 	}
 
-	getMessagesForUser = function(userID, offset, func)
+	getMessagesForUser = function(userID, offset, func, errorFunc)
 	{
 		var theurl = "/messages/"+userID;
 
@@ -39,10 +42,10 @@ define(
 			url:theurl, 
 			data:serverdata,
 			type:'POST'
-		}, func);
+		}, func, errorFunc);
 	}
 
-	followUser = function(userID, func)
+	followUser = function(userID, func, errorFunc)
 	{
 		var theurl = "/account/follow/"+userID;
 		var serverdata = {};
@@ -50,10 +53,10 @@ define(
 		sendAjax({
 			url:theurl, 
 			data:serverdata
-		}, func);
+		}, func, errorFunc);
 	}
 
-	getMessageWithId = function(msgID, offset, func)
+	getMessageWithId = function(msgID, offset, func, errorFunc)
 	{
 		var theurl = "/messages/"+msgID;
 
@@ -65,10 +68,10 @@ define(
 			url:theurl, 
 			data:serverdata,
 			type:'POST'
-		}, func);
+		}, func, errorFunc);
 	}
 
-	getAnswersTo = function(msgID, offset, func)
+	getAnswersTo = function(msgID, offset, func, errorFunc)
 	{
 		var theurl = "/messages/answers/"+msgID;
 
@@ -80,10 +83,10 @@ define(
 			url:theurl, 
 			data:serverdata,
 			type:'POST'
-		}, func);
+		}, func, errorFunc);
 	}
 
-	getAnswerForm = function(func, formdata)
+	getAnswerForm = function(formdata, func, errorFunc)
 	{
 		request = {
 			url:"/answer/"
@@ -93,10 +96,10 @@ define(
 			request['data'] = formdata;
 			request['type'] = "POST";
 		}
-		sendAjax(request, func);
+		sendAjax(request, func, errorFunc);
 	}
 
-	deleteMessageWithId = function(msgID, func)
+	deleteMessageWithId = function(msgID, func, errorFunc)
 	{
 		var theurl = "/messages/delete/"+msgID;
 		var serverdata = {};
@@ -104,31 +107,31 @@ define(
 		sendAjax({
 			url:theurl, 
 			data:serverdata
-		}, func);
+		}, func, errorFunc);
 	}
 
-	getEvaluationImage = function(msgID, func)
+	getEvaluationImage = function(msgID, func, errorFunc)
 	{
 		sendAjax({
 			url:"/media/eval/"+msgID, 
 			data:{}
-		}, func);
+		}, func, errorFunc);
 	}
 
-	sendEvaluation = function(msgID, evalList, func)
+	sendEvaluation = function(msgID, evalList, func, errorFunc)
 	{
 		sendAjax({
 			url:"/messages/evaluate/"+msgID,
 			data:evalList,
 			type:'POST'
-		}, func);
+		}, func, errorFunc);
 	}
 
 	getNotificationCount = function(func)
 	{
 		sendAjax({
 			url:"/notifications/json/",
-		}, func);
+		}, func, errorFunc);
 	}
 
 	return this;

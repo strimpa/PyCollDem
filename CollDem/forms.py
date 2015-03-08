@@ -41,10 +41,12 @@ class RegisterForm(ModelForm):
 		return user
 
 class EnterMessageForm(forms.Form):
-	header = forms.CharField(max_length=256, label="")
-	text = forms.CharField(max_length=1024, widget=forms.Textarea, label="")
+	header = forms.CharField(max_length=256, label="Summary")
+	text = forms.CharField(max_length=1024, widget=forms.Textarea, label="Text")
 	visibility = forms.ChoiceField(widget=forms.Select, choices=Message.VISIBILITY_CHOICES, label="")
-	visible_to_users = forms.CharField(max_length=1024, label="", required=False)
+	#visible_to_users = forms.CharField(max_length=1024, label="", required=False)
+	twitter_id = forms.CharField(max_length=256, label="twitter message ID")
+
 
 class AnswerForm(forms.Form):
 	text = forms.CharField(max_length=1024, widget=forms.Textarea, label="")

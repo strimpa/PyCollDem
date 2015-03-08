@@ -5,7 +5,7 @@
 		<title>3--- Pitchf.org -- {{ title }}</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'Site.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'scripts/lib/jquery-ui.min.css' %}" />
-		<meta name="viewport" content="width=device-width-300; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
 		<script type="text/javascript">
 			userID = 
 			{% if user.is_authenticated %}
@@ -41,7 +41,9 @@
 								<li><a id="createMessageExpand">Create new message</a></li>
 								<div id="createMessage" class="innerContentBorder">
 									<form action="/" method="POST">{% csrf_token %}
-									{{ entermsg_form.as_p }}
+									<table>
+									{{ entermsg_form.as_table }}
+									</table>
 									<input type="submit" value="submit" />
 									</form>
 								</div>

@@ -57,13 +57,18 @@ $ = require(
 		else
 		{
 			var answerReplyHolder = ui.div(answerHolder, {renderBorder:false, id:replyID, prepend:true });
-			conn.getAnswerForm(function(result)
-			{
-				var answerForm = ui.renderAnswerForm(answerReplyHolder, result);
-				answerForm.find("input[value=submit]").click(function(result){
-					answerSubmitCB(result, this, msgID);
-				});
-			});
+			conn.getAnswerForm({}, 
+				function(result)
+				{
+					var answerForm = ui.renderAnswerForm(answerReplyHolder, result);
+					answerForm.find("input[value=submit]").click(function(result){
+						answerSubmitCB(result, this, msgID);
+					});
+				}, function(errorMsg)
+				{
+					answerReplyHolder.append($("<p>Couldn't load answer form. Please check your connectivity.</p>"));
+				}
+			);
 		}
 	}
 
@@ -132,48 +137,69 @@ $ = require(
 
 		var answerDiv = form.parents(".answerBox").first();
 
-		conn.getAnswerForm(function(result)
-		{
-			answerDiv.empty();
-			renderAnswers(msgID, answerDiv, 1);
-		}, formData);
+		conn.getAnswerForm(formData, 
+			function(result)
+			{
+				answerDiv.empty();
+				renderAnswers(msgID, answerDiv, 1);
+			}, function(errorMsg)
+			{
+				answerDiv.empty();
+				answerDiv.append($("<p>Couldn't load answer form. Please check your connectivity.</p>"));
+			}
+			);
 	}
 
-	function renderMsgCB(querySetFunc, param, endFunc, parent, depth, currentLimit)
+	function renderMsgCB(querySetFunc, param, endFunc, parent, depth, currentOffset)
 	{
 		if(depth==null)
 			depth = 0
 
-		if(null==currentLimit)
-			currentLimit= 0;
+		if(null==currentOffset)
+			currentOffset= 0;
 
 		var completeDataLength = 0;
 
-		querySetFunc(param, currentLimit, function(result){
+		querySetFunc(param, currentOffset, 
+			function(result){
 
-			for(msgIndex in result)
-			{
-				var msg = result[msgIndex];
-				if('completeDataLength' in msg)
-				{ 
-					completeDataLength = parseInt(msg['completeDataLength'])
+				for(msgIndex in result)
+				{
+					var msg = result[msgIndex];
+					if('completeDataLength' in msg)
+					{ 
+						completeDataLength = parseInt(msg['completeDataLength'])
+					}
+					renderMsg(parent, msg, depth);
 				}
-				renderMsg(parent, msg, depth);
-			}
 
-			if(endFunc != null)
-				endFunc(completeDataLength);
+				if(endFunc != null)
+					endFunc(completeDataLength);
 
-			var newOffset = currentLimit+result.length;
-			if(completeDataLength>newOffset)
+				var newOffset = currentOffset+result.length;
+				if(completeDataLength>newOffset)
+				{
+					var loadButton = ui.renderLoadButton(parent, newOffset);
+					loadButton.click(function(result){
+						parent.find(".errorMsg").remove();
+						renderMsgCB(querySetFunc, param, endFunc, parent, depth, newOffset);
+						loadButton.remove();
+					});
+				}
+			},
+			function(errorMsg)
 			{
-				var loadButton = ui.renderLoadButton(parent, newOffset);
+				var errorMsg = $("<p class='errorMsg'>Couldn't load answers. Please check your connectivity.</p>");
+				parent.append(errorMsg);
+				errorMsg.s
+				var loadButton = ui.renderLoadButton(parent, currentOffset);
 				loadButton.click(function(result){
-					renderMsgCB(querySetFunc, param, endFunc, parent, depth, newOffset);
+					parent.find(".errorMsg").remove();
+					renderMsgCB(querySetFunc, param, endFunc, parent, depth, currentOffset);
 					loadButton.remove();
 				});
 			}
-		});
+		);
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -190,20 +216,6 @@ $ = require(
 			}
 		}
 	});
-
-	var messages = $("#messages");
-	if(messages.length)
-	{
-		var querySetFunc = conn.getMessagesForUser;
-		var param = userID;
-		var depth = 0;
-		if(undefined!=urlMsgId && ""!=urlMsgId)
-		{
-			querySetFunc = conn.getMessageWithId;
-			param = urlMsgId;
-		}
-		renderMsgCB(querySetFunc, param, null, messages);
-	}
 
 	//Control event handler setups
 
@@ -315,6 +327,64 @@ $ = require(
 	    }
 	    return size;
 	};
+
+	function loadContent()
+	{
+		var messages = $("#messages");
+		if(messages.length)
+		{
+			var querySetFunc = conn.getMessagesForUser;
+			var param = userID;
+			var depth = 0;
+			if(undefined!=urlMsgId && ""!=urlMsgId)
+			{
+				querySetFunc = conn.getMessageWithId;
+				param = urlMsgId;
+			}
+			renderMsgCB(querySetFunc, param, null, messages);
+		}
+
+		// if(null!=twttr)
+		// {
+		// 	twttr.events.bind(
+		// 		'loaded',
+		// 		function(event){
+		// 			event.widgets.forEach(function(w){
+		// 				console.log("Created Widget", w.id);
+		// 			});
+		// 		});	
+		// }
+	}
+
+	if(navigator.onLine)
+	{
+		window.twttr = (function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+			if (d.getElementById(id)) 
+				return;
+
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "https://platform.twitter.com/widgets.js";
+			try
+			{
+				fjs.parentNode.insertBefore(js, fjs);
+
+				t._e = [];
+				t.ready = function(f) {
+					t._e.push(f);
+				};
+			}
+			catch(error)
+			{
+				console.log("Couldn't load twitter widgets! Error:"+error);
+				t.noWidgets = true;
+			}
+			return t;
+		}(document, "script", "twitter-wjs"));
+	}
+
+	loadContent();
 
 	return $;
 });

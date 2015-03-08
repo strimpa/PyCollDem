@@ -1,6 +1,6 @@
 import re, random
 
-from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation
+from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation, TwitterMessage
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
@@ -53,18 +53,30 @@ class MessageController:
 		keywords.save()
 
 	@classmethod
-	def createMessage(cls, answer_to, header, text, request, visValue):
+	def createMessage(cls, answer_to, header, text, request, visValue, twitter_id=None):
 		userid = None
 		if request.user.is_authenticated():
 			userid = request.user.guid
 
-		new_msg = Message(
-			answer_to_id=answer_to,
-			header=header, 
-			text=text, 
-			created_at=timezone.now(),
-			author_id=userid,
-			visibility=visValue)
+		new_msg = None
+		if None==twitter_id:
+			new_msg = Message(
+				answer_to_id=answer_to,
+				header=header, 
+				text=text, 
+				created_at=timezone.now(),
+				author_id=userid,
+				visibility=visValue)
+		else:
+			new_msg = TwitterMessage(
+				answer_to_id=answer_to,
+				header=header, 
+				text=text, 
+				created_at=timezone.now(),
+				author_id=userid,
+				visibility=visValue,
+				msg_id=twitter_id)
+
 		new_msg.guid=cls.createUniqueIDString(new_msg)
 		new_msg.save()
 
