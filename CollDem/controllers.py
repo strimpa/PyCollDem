@@ -1,6 +1,6 @@
 import re, random
 
-from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation
+from CollDem.models import Message, CollDemUser, KeywordList, Keyword, Evaluation, TwitterMessage
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
@@ -53,25 +53,39 @@ class MessageController:
 		keywords.save()
 
 	@classmethod
-	def createMessage(cls, answer_to, header, text, request, visValue):
+	def createMessage(cls, answer_to, header, text, request, visValue, twitter_id=None):
 		userid = None
 		if request.user.is_authenticated():
 			userid = request.user.guid
 
-		new_msg = Message(
-			answer_to_id=answer_to,
-			header=header, 
-			text=text, 
-			created_at=timezone.now(),
-			author_id=userid,
-			visibility=visValue)
+		new_msg = None
+		if None==twitter_id:
+			new_msg = Message(
+				answer_to_id=answer_to,
+				header=header, 
+				text=text, 
+				created_at=timezone.now(),
+				author_id=userid,
+				visibility=visValue)
+		else:
+			new_msg = TwitterMessage(
+				answer_to_id=answer_to,
+				header=header, 
+				text=text, 
+				created_at=timezone.now(),
+				author_id=userid,
+				visibility=visValue,
+				msg_id=twitter_id)
+
 		new_msg.guid=cls.createUniqueIDString(new_msg)
 		new_msg.save()
 
-		keywords = KeywordList(for_msg=new_msg)
+		keywords = KeywordList.objects.create(for_msg=new_msg)
 		keywords.save()
 		for defaultKeyTuple in Evaluation.EVAL_DEFAULT_CHOICES:
-			cls.AddEvalKeyword(new_msg, defaultKeyTuple[0])
+			cls.AddEvalKeyword(new_msg, defaultKeyTuple[1])
+
+		return new_msg
 
 	def __init__(self, msg):
 		self.myMsg = msg
@@ -97,6 +111,9 @@ class MessageController:
 		evaluation['activeUserEvaluation'] = {}
 		for es in self.myMsg.user_evaluation.all():
 			for e in es.evaluation_set.all():
+				if not (e.name in evaluation['keywords']):
+					continue
+
 				if None!=user and es.evaluator == user:
 					evaluation['activeUserEvaluation'][e.name] = e.factor
 
@@ -109,5 +126,23 @@ class MessageController:
 			evaluation['summary'][key] = val/len(self.myMsg.user_evaluation.all())
 
 		return evaluation
+
+	def setKeywords(self, keys):
+		keySet, created = KeywordList.objects.get_or_create(for_msg=self.myMsg)
+		keySet.keyword_set.clear()
+
+		for key in keys:
+			evaluation, created = Keyword.objects.get_or_create(name=key)
+			keySet.keyword_set.add(evaluation)
+
+		#default values
+		for defValIndex in range(0, len(Evaluation.EVAL_DEFAULT_CHOICES)):
+			defVal = Evaluation.EVAL_DEFAULT_CHOICES[defValIndex][1]
+			if defValIndex >= keySet.keyword_set.count():
+				evaluation, created = Keyword.objects.get_or_create(name=defVal)
+				keySet.keyword_set.add(evaluation)
+
+		keySet.save()
+		return True
 
 		

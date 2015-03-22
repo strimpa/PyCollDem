@@ -15,6 +15,8 @@ class SocialNetwork(models.Model):
 	name = models.CharField("Name of the network", max_length=256)
 	description = models.CharField("Description of the service provided", max_length=512)
 	home = models.URLField("Home URL of the service")
+
+	access_token = models.CharField("oauth access token", max_length=256, editable=False, blank=True)
 	
 	def __unicode__(self):
 		return self.name
@@ -76,6 +78,7 @@ class CollDemUserManager(BaseUserManager):
 		theuser = self.create_user(username, email, password)
 		theuser.is_admin = True
 		theuser.is_active = True
+		theuser.save(using=self._db)
 		return theuser
 
 
@@ -181,3 +184,11 @@ class Evaluation(models.Model):
 	def __unicode__(self):
 		return (name+":"+str(factor))
 
+##########################
+## overloads
+
+class FacebookMessage(Message):
+	fb_identifier = models.IntegerField("facebook identifier", editable=False)
+
+class TwitterMessage(Message):
+	msg_id = models.CharField("Twitter message identifier", max_length=256, editable=False)

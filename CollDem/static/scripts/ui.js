@@ -1,5 +1,5 @@
 define(
-	['jqueryui', 'jCookie', 'EvaluationSvg', 'snap'], function(jui, jCookie, evalImage, snap)
+	['jqueryui', 'jCookie', 'EvaluationSvg', 'snap', 'tagit'], function(jui, jCookie, evalImage, snap, tagit)
 {
 	// helpers
 
@@ -12,14 +12,41 @@ define(
 
 		// right aligned things
 		messageDiv.append("<div class='msgUserInfoGroup innerContentBorder'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
-		messageDiv.append("<div class='evaluationGroup innerContentBorder'><span id='evaluation' /><div id='evalLabel_"+msg['id']+"'></div>");
+		var evalGroup = $("<div class='evaluationGroup innerContentBorder' />");
+		messageDiv.append(evalGroup);
 		
 		// message content
 		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
-		messageDiv.append("<p>"+msg.text+"</p>");
-		
+		if('twitter_id' in msg)
+		{
+			console.log("adding "+msg['twitter_id']+".");
+			if(	window['twttr'] != undefined && 
+				twttr.widgets!=null)
+			{
+				var tweetWrapID = ("tweetWrap_"+msg['id']);
+				var tweetWrap = div(messageDiv, {id:tweetWrapID});
+				promise = twttr.widgets.createTweet(
+						msg['twitter_id'],
+						document.getElementById(tweetWrapID)
+					);
+				promise.then(function(){
+					console.log("tweet "+msg['twitter_id']+" added!");
+				});
+				promise.catch(function(reason){
+					alert("error:"+reason);
+				});
+			}
+			else
+			{
+				messageDiv.append("<p class='errorMsg'>Error loading twitter widgets!</p>");
+			}
+		}
+		else
+		{			
+			messageDiv.append("<p>"+msg.text+"</p>");
+		}		
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
-		if(msg['can_delete'])
+		if(msg['is_author'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
 
 		messageDiv.append(answerActions);
@@ -115,10 +142,50 @@ define(
 		})
 	}
 
-	renderEvaluationImage = function(parent, evalObj, msgID, conn)
+	renderEvaluation = function(parent, msg, conn)
 	{
+		var evalObj = msg['evaluation'];
+		var msgID = msg['id']
+		parent.empty();
+
+		var msgEvalDiv = $("<span id='evaluation' />");
 		var image = evalImage.CreateEvaluationImage(evalObj, msgID, conn);
-		parent.append(image.node);
+		msgEvalDiv.append(image.node);
+		parent.append(msgEvalDiv);
+
+		// evaluation controls
+		var isAuthor = msg['is_author']
+		if(isAuthor)
+		{
+			var button = $("<input type='button' id='evalAdjust' value='keywords' />");
+			parent.append(button);
+			button.click(function(){
+				var dialogDiv = $("#dialogDummy");
+				var keyWorkString = evalObj['keywords'].join();
+				var tagField = $("<input type='text' id='keytags' value='"+keyWorkString+"' />");
+				dialogDiv.html(tagField);
+				tagField.tagit();
+				dialogDiv.dialog({
+					buttons:
+					{
+						"OK": function(res){
+							var assignedTags = tagField.tagit("assignedTags");
+							console.log(this.evalDiv);
+							var data = {};
+							for(t in assignedTags)
+								data[assignedTags[t]] = 10.0;
+							conn.setMsgKeywords(msgID, data, function(result){
+								renderEvaluation(parent, result, conn);
+							});
+							$(this).dialog("close");
+						},
+						Cancel:function(res){$(this).dialog("close");}
+					}
+				});
+			});
+		}
+		else
+			parent.append("<div id='evalLabel_"+msgID+"' />");
 	}
 
 	renderUpdateCircle = function(parent, numberUpdates)

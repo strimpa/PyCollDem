@@ -28,12 +28,14 @@ class CollDemEncoder(JSONEncoder):
 				'avatar':CollDemUser.objects.get_pic(obj.author),
 				'header':obj.header, 
 				'text':obj.text,
-				'can_delete':(obj.author == obj.requestUser),
+				'is_author':(obj.author == obj.requestUser),
 				'evaluation':controller.getEvaluation(obj.requestUser),
-				'completeDataLength':obj.completeDataLength
 			}
-			# for evalSet in obj.user_evaluation.all():
-			# 	returnObject['evaluation'].append(self.default(evalSet))
+			if hasattr(obj, 'completeDataLength'):
+				returnObject['completeDataLength'] = obj.completeDataLength
+
+			if hasattr(obj, 'twittermessage'):
+				returnObject['twitter_id'] = obj.twittermessage.msg_id
 
 			return returnObject
 

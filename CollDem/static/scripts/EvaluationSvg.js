@@ -46,7 +46,6 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		var gripGroup = canvas.group();
 		var keywords = [];
 		var currEvalObj = null;
-		var myLabel = $("#evalLabel_"+msgID);
 
 		var thisCallbackTarget = this;
 
@@ -130,19 +129,29 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		{
 			$(summaryGroup.node).empty();
 			renderPolygon(neutralRadius, summaryGroup, {
-			    fill: "#666",
-			    stroke: "none",
-			    strokeWidth: 5
+			    fill: "#999",
+			    stroke: "#666",
+			    strokeWidth: 1
 			});
-			renderPolygon(outerRadius, summaryGroup, {
+			var maxverts = renderPolygon(outerRadius, summaryGroup, {
 			    fill: "none",
 			    stroke: "#000",
 			    strokeWidth: 0.5
 			}, false);
-			renderPolygon(minRadius, summaryGroup, {
+			var minverts = renderPolygon(minRadius, summaryGroup, {
 			    fill: "#000",
 			    stroke: "none",
 			}, false);
+			for(vi in maxverts)
+			{
+				var line = canvas.line(minverts[vi].x, minverts[vi].y, maxverts[vi].x, maxverts[vi].y);
+				line.attr({
+				    fill: "none",
+				    stroke: "#666",
+				    strokeWidth: 0.2
+				});
+				summaryGroup.add(line);
+			}
 		}
 
 		updateToolGroup = function()
@@ -192,11 +201,15 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				handleGroup.drag(moveFn, startFn, endFn);
 				handleGroup.hover(
 					function(){
-						myLabel.animate({"color": "rgba(0,0,0,1)"}, 100)
+						var myLabel = $("#evalLabel_"+msgID);
+						myLabel.animate({"color": "rgba(0,0,0,1)"}, 100);
+						console.log(this.label);
 						myLabel.text(this.label);
 					},
 					function(){
-						myLabel.animate({"color": "rgba(0,0,0,0)"}, 1000)
+						var myLabel = $("#evalLabel_"+msgID);
+						myLabel.animate({"color": "rgba(0,0,0,0)"}, 1000);
+						console.log("deleted label");
 						myLabel.text("");
 					}
 				);

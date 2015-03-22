@@ -6,7 +6,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Q
-from CollDem.models import CollDemUser, Message, Evaluation, EvaluationSet
+from CollDem.models import CollDemUser, Message, Evaluation, EvaluationSet, KeywordList, Keyword
 from CollDem.json_convert import CollDemEncoder
 from forms import AnswerForm
 from CollDem.controllers import MessageController
@@ -121,5 +121,22 @@ def evaluate(request, msgid):
 	evalSet.save()
 
 	data = json.dumps(msgController.getEvaluation(request.user))
+
+	return HttpResponse(data, content_type='application/json')
+
+def set_keywords(request, msgid):
+	msg = Message.objects.get(guid=msgid)
+	msgController = MessageController(msg)
+
+	if not msgController.mayUserInteract(request.user):
+		data = json.dumps(msgController.getEvaluation())
+		return HttpResponse(data, content_type='application/json')
+
+	success = msgController.setKeywords([postVarKey for postVarKey,postVarVal in request.POST.items()])
+	if not success:
+		return HttpResponse("Message has no keyword set!", content_type='text/plain');
+
+	msg.requestUser = request.user
+	data = json.dumps(msg, cls=CollDemEncoder)
 
 	return HttpResponse(data, content_type='application/json')
