@@ -53,7 +53,7 @@ class MessageController:
 		keywords.save()
 
 	@classmethod
-	def createMessage(cls, answer_to, header, text, request, visValue):
+	def createMessage(cls, answer_to, header, text, request, visValue, twitter_id=None):
 		userid = None
 		if request.user.is_authenticated():
 			userid = request.user.guid

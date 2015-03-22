@@ -40,6 +40,45 @@ def handleMessageForm(request):
 
 	return entermsg_form
 
+def handleOAuth(request):
+	twitter = Twython(settings.APP_KEY, settings.APP_SECRET)
+	try:
+		auth = twitter.get_authentication_tokens(callback_url=settings.TWITTER_CALLBACK)
+	
+		request.session['OAUTH_TOKEN'] = auth['oauth_token']
+		request.session['OAUTH_TOKEN_SECRET'] = auth['oauth_token_secret']
+
+		return auth['auth_url']
+	except TwythonAuthError:
+		pass
+	return None
+
+def handleOAuthAppOnly():
+	twitter = None
+
+	try:
+	    twitter_network = SocialNetwork.objects.get(name="Twitter")
+	    twitter = Twython(settings.APP_KEY, access_token=twitter_network.acces_token)
+	except Exception, e:
+		return None
+    
+	twitter = Twython(settings.APP_KEY, settings.APP_SECRET, oauth_version=2)
+	if None==twitter:
+		return None
+
+	try:
+		access_token = twitter.obtain_access_token()
+	except TwythonAuthError:
+		return None
+
+	twitter_network = SocialNetwork.objects.create(
+		name="Twitter", 
+		description="128 character exibitionism",
+		home="http://www.twitter.com",
+		access_token=access_token)
+	twitter = Twython(settings.APP_KEY, access_token=access_token)
+	return twitter
+
 def home(request, urlMsgId=""):
 	entermsg_form = None
 	login_form = None
@@ -50,6 +89,11 @@ def home(request, urlMsgId=""):
 
 	MessageFormSet = modelformset_factory(Message, fields=['header', 'text'], widgets={'text':Textarea()})
 	message_formset = MessageFormSet(queryset=Message.objects.all())
+
+#	auth_url = handleOAuth(request)
+
+	twitter = handleOAuthAppOnly()
+#	search_result = twitter.search(q='gunchirp')
 
 	return render(request, 'home.html', {
 		'login_form'			: LoginForm(), 
