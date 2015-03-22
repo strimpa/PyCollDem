@@ -17,34 +17,7 @@ define(
 		
 		// message content
 		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
-		if('twitter_id' in msg)
-		{
-			console.log("adding "+msg['twitter_id']+".");
-			if(	window['twttr'] != undefined && 
-				twttr.widgets!=null)
-			{
-				var tweetWrapID = ("tweetWrap_"+msg['id']);
-				var tweetWrap = div(messageDiv, {id:tweetWrapID});
-				promise = twttr.widgets.createTweet(
-						msg['twitter_id'],
-						document.getElementById(tweetWrapID)
-					);
-				promise.then(function(){
-					console.log("tweet "+msg['twitter_id']+" added!");
-				});
-				promise.catch(function(reason){
-					alert("error:"+reason);
-				});
-			}
-			else
-			{
-				messageDiv.append("<p class='errorMsg'>Error loading twitter widgets!</p>");
-			}
-		}
-		else
-		{			
-			messageDiv.append("<p>"+msg.text+"</p>");
-		}		
+		messageDiv.append("<p>"+msg.text+"</p>");
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
 		if(msg['is_author'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");

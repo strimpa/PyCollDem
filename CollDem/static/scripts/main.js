@@ -344,45 +344,6 @@ $ = require(
 			}
 			renderMsgCB(querySetFunc, param, null, messages);
 		}
-
-		// if(null!=twttr)
-		// {
-		// 	twttr.events.bind(
-		// 		'loaded',
-		// 		function(event){
-		// 			event.widgets.forEach(function(w){
-		// 				console.log("Created Widget", w.id);
-		// 			});
-		// 		});	
-		// }
-	}
-
-	if(navigator.onLine)
-	{
-		window.twttr = (function(d, s, id) {
-			var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
-			if (d.getElementById(id)) 
-				return;
-
-			js = d.createElement(s);
-			js.id = id;
-			js.src = "https://platform.twitter.com/widgets.js";
-			try
-			{
-				fjs.parentNode.insertBefore(js, fjs);
-
-				t._e = [];
-				t.ready = function(f) {
-					t._e.push(f);
-				};
-			}
-			catch(error)
-			{
-				console.log("Couldn't load twitter widgets! Error:"+error);
-				t.noWidgets = true;
-			}
-			return t;
-		}(document, "script", "twitter-wjs"));
 	}
 
 	loadContent();

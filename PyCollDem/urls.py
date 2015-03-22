@@ -17,8 +17,6 @@ urlpatterns = patterns('',
     url(r'^notifications/json/', 'CollDem.analytics.notifications'),
     url(r'^media/eval/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluation'),
 
-    url(r'^search_twitter/$', 'CollDem.views.search_twitter'),
-    
     # Main content urls:
     url(r'^admin/$', include(admin.site.urls)),
     url(r'^account/$', 'CollDem.views.account'),

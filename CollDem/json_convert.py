@@ -34,9 +34,6 @@ class CollDemEncoder(JSONEncoder):
 			if hasattr(obj, 'completeDataLength'):
 				returnObject['completeDataLength'] = obj.completeDataLength
 
-			if hasattr(obj, 'twittermessage'):
-				returnObject['twitter_id'] = obj.twittermessage.msg_id
-
 			return returnObject
 
 		return JSONEncoder.default(self, obj)

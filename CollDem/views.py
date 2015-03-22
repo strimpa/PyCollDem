@@ -1,5 +1,3 @@
-from twython import Twython
-
 import lang
 
 from django.utils import timezone
@@ -34,55 +32,13 @@ def handleMessageForm(request):
 			visValue = entermsg_form.cleaned_data['visibility']
 			header = entermsg_form.cleaned_data['header']
 			text = entermsg_form.cleaned_data['text']
-			twitter_id = entermsg_form.cleaned_data['twitter_id']
 			keywords = entermsg_form.cleaned_data['keywords']
-			if twitter_id=='':
-				twitter_id = None
-			msg = MessageController.createMessage(None, header, text, request, visValue, twitter_id)
+			msg = MessageController.createMessage(None, header, text, request, visValue)
 			msgController = MessageController(msg)
 			keyWordArray = keywords.split(',')
 			msgController.setKeywords(keyWordArray)
 
 	return entermsg_form
-
-def handleOAuth(request):
-	twitter = Twython(settings.APP_KEY, settings.APP_SECRET)
-	try:
-		auth = twitter.get_authentication_tokens(callback_url=settings.TWITTER_CALLBACK)
-	
-		request.session['OAUTH_TOKEN'] = auth['oauth_token']
-		request.session['OAUTH_TOKEN_SECRET'] = auth['oauth_token_secret']
-
-		return auth['auth_url']
-	except TwythonAuthError:
-		pass
-	return None
-
-def handleOAuthAppOnly():
-	twitter = None
-
-	try:
-	    twitter_network = SocialNetwork.objects.get(name="Twitter")
-	    twitter = Twython(settings.APP_KEY, access_token=twitter_network.acces_token)
-	except Exception, e:
-		return None
-    
-	twitter = Twython(settings.APP_KEY, settings.APP_SECRET, oauth_version=2)
-	if None==twitter:
-		return None
-
-	try:
-		access_token = twitter.obtain_access_token()
-	except TwythonAuthError:
-		return None
-
-	twitter_network = SocialNetwork.objects.create(
-		name="Twitter", 
-		description="128 character exibitionism",
-		home="http://www.twitter.com",
-		access_token=access_token)
-	twitter = Twython(settings.APP_KEY, access_token=access_token)
-	return twitter
 
 def home(request, urlMsgId=""):
 	entermsg_form = None
@@ -94,11 +50,6 @@ def home(request, urlMsgId=""):
 
 	MessageFormSet = modelformset_factory(Message, fields=['header', 'text'], widgets={'text':Textarea()})
 	message_formset = MessageFormSet(queryset=Message.objects.all())
-
-#	auth_url = handleOAuth(request)
-
-	twitter = handleOAuthAppOnly()
-#	search_result = twitter.search(q='gunchirp')
 
 	return render(request, 'home.html', {
 		'login_form'			: LoginForm(), 
@@ -159,18 +110,6 @@ def register(request):
 	register_form = RegisterForm();
 #	password_form = SetPasswordForm();
 	
-	#oauth
-	if request.method == "GET" and 'oauth_verifier' in request.GET:
-		oauth_verifier = request.GET['oauth_verifier']
-		#Now that you have the oauth_verifier stored to a variable, you'll want to create a new instance of Twython and grab the final user tokens
-		twitter = Twython(APP_KEY, APP_SECRET,OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-
-		final_step = twitter.get_authorized_tokens(oauth_verifier)
-		#Once you have the final user tokens, store them in a database for later use:
-		OAUTH_TOKEN = final_step['oauth_token']
-		OAUTH_TOKEN_SECRET = final_step['oauth_token_secret']
-
-
 	if request.method == "POST":
 		register_form = RegisterForm(request.POST, request.FILES)
 		if register_form.is_valid():
@@ -184,11 +123,8 @@ def register(request):
 			send_mail('Please confirm your registration', lang('REG_CONFIRMATION_MAIL', the_user.username, the_user.guid), 'dont_reply@tuets.com', [the_user.email])
 			return HttpResponseRedirect('/register/confirm/') # Redirect after POST
 
-	auth_url = handleOAuth(request)
-
 	return render(request, "register.html", {
 		'register_form'		: register_form,
-		'auth_url'			: auth_url,
 		'login_form'		: LoginForm(),
 		'title'				: "Register"
 		})
@@ -224,18 +160,3 @@ def profile(request, userId=None, username=None):
 		'login_form':LoginForm(),
 		'title': ("Public profile of "+CollDemUser.objects.the_user.username)
 		})
-
-def search_twitter(request):
-	twitter = handleOAuthAppOnly()
-	search_result = []
-	if request.method=='POST' and 'search_string' in request.POST:
-		search_result = twitter.search(q=request.POST['search_string'])
-		for tweet in search_result['statuses']:
-		    Twython.html_for_tweet(tweet)
-
-	return render(request, 'search_twitter.html', {
-		'login_form'			: LoginForm(), 
-		'search_result'			: search_result,
-		'title'					: "Search Twitter"
-		}, 
-		context_instance=RequestContext(request))

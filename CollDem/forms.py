@@ -46,7 +46,6 @@ class EnterMessageForm(forms.Form):
 	keywords = forms.CharField(max_length=256, label="Keywords", required=True)
 	visibility = forms.ChoiceField(widget=forms.Select, choices=Message.VISIBILITY_CHOICES, label="")
 	#visible_to_users = forms.CharField(max_length=1024, label="", required=False)
-	twitter_id = forms.CharField(max_length=256, label="twitter message ID", required=False)
 
 
 class AnswerForm(forms.Form):
