@@ -13,14 +13,15 @@ define(
 		var messageInnerDiv = div(messageDiv, {id:("message_"+msg['id'])});
 		messageInnerDiv.attr("message_id", msg['id']);
 
+		messageInnerDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
+
 		// right aligned things
 		messageInnerDiv.append("<div class='msgUserInfoGroup innerContentBorder'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
 		var evalGroup = $("<div class='evaluationGroup innerContentBorder' />");
 		messageInnerDiv.append(evalGroup);
 		
 		// message content
-		messageInnerDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
-		messageInnerDiv.append("<p>"+msg.text+"</p>");
+		messageInnerDiv.append("<p class='msgText'>"+msg.text+"</p>");
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
 		if(msg['is_author'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
@@ -128,6 +129,7 @@ define(
 		var image = evalImage.CreateEvaluationImage(evalObj, msgID, conn);
 		msgEvalDiv.append(image.node);
 		parent.append(msgEvalDiv);
+		parent.append("<br />");
 
 		// evaluation controls
 		var isAuthor = msg['is_author']

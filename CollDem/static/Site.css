@@ -169,9 +169,8 @@ header h1, #header h1 {
 
 .messageDimensions
 {
-    max-width: 600px;
+    max-width: 400px;
     min-width: 300px;
-    width: 400px;
     border-width: 0px 0px 0px 1px;
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
@@ -190,6 +189,11 @@ header h1, #header h1 {
     border-style: solid;
     padding:2px;
     margin:3px;
+}
+
+.innerMessageDiv p
+{
+    margin:0px;
 }
 
 .answerBox
@@ -281,6 +285,11 @@ footer,
     padding:2px;
 }
 
+.msgText
+{
+    margin-left: 3px;
+}
+
 .msgUserInfoGroup
 {
     text-align: center;
@@ -288,7 +297,6 @@ footer,
     float:right;
     margin:2px;
     padding:2px;
-    width:80px;
     height:62px;
 }
 .evaluationGroup
@@ -297,13 +305,13 @@ footer,
     float:right;
     padding:2px;
     margin:2px;
-    width:80px;
     height:62px;
 }
 
 #msgHolder
 {
     margin-bottom: 5px;
+    overflow: auto;
 }
 
 /* TAB MENU   
