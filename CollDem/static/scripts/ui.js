@@ -7,38 +7,41 @@ define(
 	// public functions 
 	renderMessage = function(parentNode, msg, isAnswer)
 	{
-		var messageDiv = div(parentNode, {id:("message_"+msg['id'])});
-		messageDiv.attr("message_id", msg['id']);
+		var messageDiv = div(parentNode);
+		messageDiv.attr("class", "messageDimensions");
+		
+		var messageInnerDiv = div(messageDiv, {id:("message_"+msg['id'])});
+		messageInnerDiv.attr("message_id", msg['id']);
 
 		// right aligned things
-		messageDiv.append("<div class='msgUserInfoGroup innerContentBorder'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
+		messageInnerDiv.append("<div class='msgUserInfoGroup innerContentBorder'><img class='msgPic' src="+msg.avatar+" /> <br /><a href='/profile/"+msg.author+"'>"+msg.author+"</a></div>");
 		var evalGroup = $("<div class='evaluationGroup innerContentBorder' />");
-		messageDiv.append(evalGroup);
+		messageInnerDiv.append(evalGroup);
 		
 		// message content
-		messageDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
-		messageDiv.append("<p>"+msg.text+"</p>");
+		messageInnerDiv.append("<p><strong><a href='/"+msg['id']+"'>"+msg.header+"</a></strong></p>");
+		messageInnerDiv.append("<p>"+msg.text+"</p>");
 		var answerActions = $("<p id='answerActions'><a id='expand'><span id='msgAnswerCountDiv'/> answers</a> | <a id='reply'>Reply</a>");
 		if(msg['is_author'])
 			answerActions.append(" | <a id='delete'>Delete</a></p>");
 
-		messageDiv.append(answerActions);
+		messageInnerDiv.append(answerActions);
 
 		// style things
-		var classString = "messageDimensions";
+		var classString = "innerMessageDiv";
 		if(isAnswer==true)
 			classString += " answerDiv ";
-		messageDiv.attr("class", classString);
-		messageDiv.append("<p style='clear:both;'/>");
+		messageInnerDiv.attr("class", classString);
+		messageInnerDiv.append("<p style='clear:both;'/>");
 
 		// getting height, setting to 0 and then expandding and deleting.
-		var height = messageDiv.css("height");
-		messageDiv.css("height", "0px");
-		messageDiv.animate({height:height}, 300, "swing", function(){
-			messageDiv.css("height", "auto")
+		var height = messageInnerDiv.css("height");
+		messageInnerDiv.css("height", "0px");
+		messageInnerDiv.animate({height:height}, 300, "swing", function(){
+			messageInnerDiv.css("height", "auto")
 		});			
 
-		return messageDiv;
+		return messageInnerDiv;
 	}
 
 	renderLoadButton = function(parentNode, offset)
@@ -73,12 +76,12 @@ define(
 	{
 		var theDiv = $("<div />");
 		if(parentNode!=null)
-			if(true==params.prepend)
+			if(undefined!=params && true==params.prepend)
 				parentNode.prepend(theDiv);
 			else
 				parentNode.append(theDiv);
-		var classString = "messageDimensions";
-		if(null!=params)
+		var classString = "";
+		if(undefined!=params)
 		{
 			if(undefined!=params.id)
 				theDiv.attr("id", params.id);

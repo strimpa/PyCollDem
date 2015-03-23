@@ -160,8 +160,7 @@ header h1, #header h1 {
 }
 
 .innerContentBorder{
-    padding-left: 10px;
-    border-width: 0px 0px 0px 1px;
+    border-width: 0px 0px 0px 1px;;
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
     -moz-border-radius: 5px 5px 5px 5px;
@@ -170,9 +169,27 @@ header h1, #header h1 {
 
 .messageDimensions
 {
-    max-width: 800px;
+    max-width: 600px;
     min-width: 300px;
-    overflow:auto;
+    width: 400px;
+    border-width: 0px 0px 0px 1px;
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+/*    border-style: solid;
+*/    overflow:auto;
+}
+
+.innerMessageDiv
+{
+    background-color: #F3FEF3;
+    border-width: 0px;
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    border-style: solid;
+    padding:2px;
+    margin:3px;
 }
 
 .answerBox
@@ -213,6 +230,7 @@ footer,
 #messages
 {
     overflow: hidden;
+    padding-left: 10px;
 }
 
 #createMessage
