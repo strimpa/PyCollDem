@@ -169,8 +169,8 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				handleGroup.label = keywords[i];
 				handleGroup.lastPos = vertices[i].offset;
 				handleGroup.myTool = thisCallbackTarget;
-				handleGroup.add(handleSensor);
 				handleGroup.add(handle);
+				handleGroup.add(handleSensor);
 
 				var handleID = msgID+"_"+handleGroup.label;
 				$(handle).attr("id", handleID);
@@ -208,8 +208,8 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 					conn.sendEvaluation(msgID, evalList, this.myTool.reset);
 				};
 				handleGroup.drag(moveFn, startFn, endFn);
-				handleGroup.label = labelField;
-				handleGroup.hover(
+				handleSensor.label = labelField;
+				handleSensor.hover(
 					function(){
 //						console.log(this);
 						var theHandle = $(this.node);
