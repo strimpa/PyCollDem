@@ -155,21 +155,26 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 			}
 		}
 
-		updateToolGroup = function()
+		updateToolGroup = function(canEvaluate)
 		{
 			var vertices = renderPolygon(neutralRadius, lineGroup, toolLineAttr, true, true);
 			var userEvaluation = evalObj['activeUserEvaluation'];
 			for (var i = 0; i < directions.length; i++) {
 				var handleGroup = canvas.group();
-				var handleSensor = canvas.circle(vertices[i].x, vertices[i].y, 6);
-				handleSensor.attr(toolHandleSensorAttrs);
-				var handle = canvas.circle(vertices[i].x, vertices[i].y, 0);
-				handle.attr(toolHandleAttrs);
 				handleGroup.myDir = directions[i];
 				handleGroup.label = keywords[i];
 				handleGroup.lastPos = vertices[i].offset;
 				handleGroup.myTool = thisCallbackTarget;
-				handleGroup.add(handle);
+
+				var handleSensor = canvas.circle(vertices[i].x, vertices[i].y, 6);
+				handleSensor.attr(toolHandleSensorAttrs);
+				if(canEvaluate)
+				{				
+					var handle = canvas.circle(vertices[i].x, vertices[i].y, 0);
+					handle.attr(toolHandleAttrs);
+					handleGroup.add(handle);
+					handles.push(handle);
+				}				
 				handleGroup.add(handleSensor);
 
 				var handleID = msgID+"_"+handleGroup.label;
@@ -181,7 +186,6 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				//handleGroup.add(canvas.text(vertices[i].x+5, vertices[i].y, handleGroup.label));
 
 				gripGroup.add(handleGroup);
-				handles.push(handle);
 
 				moveFn = function(dx, dy, x, y){
 					var userDir = $V([dx, dy]);
@@ -245,8 +249,8 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 
 		this.reset(evalObj);
 
-		if('can_evaluate' in evalObj && evalObj['can_evaluate'])
-			updateToolGroup();
+		var canEvaluate = 'can_evaluate' in evalObj && evalObj['can_evaluate'];
+		updateToolGroup(canEvaluate);
 
 		canvas.hover(
 			function(){
