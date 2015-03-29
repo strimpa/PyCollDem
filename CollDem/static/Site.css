@@ -310,6 +310,18 @@ footer,
     height:62px;
 }
 
+.evalLabel
+{
+    position:absolute;
+    background-color: #E3EEE3;
+    border-width: 1px;
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    border-style: solid;
+    overflow: hidden;
+}
+
 #msgHolder
 {
     margin-bottom: 5px;

@@ -16,6 +16,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		var outerRadius = 25;
 
 		var handleRadius = 3;
+		var handleDiameter = 10;
 
 		var toolLineAttr = {
 			    fill: "none",
@@ -170,7 +171,15 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				handleGroup.myTool = thisCallbackTarget;
 				handleGroup.add(handleSensor);
 				handleGroup.add(handle);
-//				handleGroup.add(canvas.text(vertices[i].x+5, vertices[i].y, handleGroup.label));
+
+				var handleID = msgID+"_"+handleGroup.label;
+				$(handle).attr("id", handleID);
+
+				var labelField = $("<div>"+handleGroup.label+"</div>");
+				$("body").append(labelField);
+				labelField.attr("class", "evalLabel");
+				//handleGroup.add(canvas.text(vertices[i].x+5, vertices[i].y, handleGroup.label));
+
 				gripGroup.add(handleGroup);
 				handles.push(handle);
 
@@ -199,18 +208,26 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 					conn.sendEvaluation(msgID, evalList, this.myTool.reset);
 				};
 				handleGroup.drag(moveFn, startFn, endFn);
+				handleGroup.label = labelField;
 				handleGroup.hover(
 					function(){
-						var myLabel = $("#evalLabel_"+msgID);
-						myLabel.animate({"color": "rgba(0,0,0,1)"}, 100);
-						console.log(this.label);
-						myLabel.text(this.label);
+//						console.log(this);
+						var theHandle = $(this.node);
+						var pos = theHandle.position();
+						this.label.css("top", pos.top);
+						this.label.css("left", pos.left+handleDiameter);
+						this.label.css("width", "auto");
+						var actualWidth = this.label.css("width");
+						this.label.css("width", "0px");
+						this.label.css("visibility", "visible");
+						this.label.animate({"width": actualWidth}, 300);
 					},
 					function(){
-						var myLabel = $("#evalLabel_"+msgID);
-						myLabel.animate({"color": "rgba(0,0,0,0)"}, 1000);
+						//var myLabel = $("#evalLabel_"+msgID);
+						//myLabel.animate({"color": "rgba(0,0,0,0)"}, 1000);
 						console.log("deleted label");
-						myLabel.text("");
+						this.label.animate({"width": "0px"}, 300, function(){$(this).css("visibility", "hidden");});
+						//myLabel.text("");
 					}
 				);
 			};
