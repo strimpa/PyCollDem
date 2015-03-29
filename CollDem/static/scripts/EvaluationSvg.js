@@ -187,31 +187,35 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 
 				gripGroup.add(handleGroup);
 
-				moveFn = function(dx, dy, x, y){
-					var userDir = $V([dx, dy]);
-					this.scalar = userDir.dot(this.myDir);
-					var globalPos= this.lastPos + this.scalar;
-					if(globalPos < -10)
-						this.scalar  -= (globalPos + 10);
-					if(globalPos > 5)
-						this.scalar  -= (globalPos - 5);
+				if(canEvaluate)
+				{				
 
-					var offsetString = (this.origTransform ? "T" : "t") + (this.myDir.x(this.scalar)).elements;
-					this.attr({
-						transform: this.origTransform + offsetString
-					});
-					updateLines();
-				};
-				startFn = function(x, y, e){
-					this.origTransform = this.transform().local;
-				};
-				endFn = function(e)
-				{
-					this.lastPos = evalList[this.label] = this.lastPos + this.scalar;
-					var handleTool = thisCallbackTarget;
-					conn.sendEvaluation(msgID, evalList, this.myTool.reset);
-				};
-				handleGroup.drag(moveFn, startFn, endFn);
+					moveFn = function(dx, dy, x, y){
+						var userDir = $V([dx, dy]);
+						this.scalar = userDir.dot(this.myDir);
+						var globalPos= this.lastPos + this.scalar;
+						if(globalPos < -10)
+							this.scalar  -= (globalPos + 10);
+						if(globalPos > 5)
+							this.scalar  -= (globalPos - 5);
+
+						var offsetString = (this.origTransform ? "T" : "t") + (this.myDir.x(this.scalar)).elements;
+						this.attr({
+							transform: this.origTransform + offsetString
+						});
+						updateLines();
+					};
+					startFn = function(x, y, e){
+						this.origTransform = this.transform().local;
+					};
+					endFn = function(e)
+					{
+						this.lastPos = evalList[this.label] = this.lastPos + this.scalar;
+						var handleTool = thisCallbackTarget;
+						conn.sendEvaluation(msgID, evalList, this.myTool.reset);
+					};
+					handleGroup.drag(moveFn, startFn, endFn);
+				}
 				handleSensor.label = labelField;
 				handleSensor.hover(
 					function(){

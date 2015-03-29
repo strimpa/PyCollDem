@@ -320,6 +320,7 @@ footer,
     -moz-border-radius: 5px 5px 5px 5px;
     border-style: solid;
     overflow: hidden;
+    visibility: hidden;
 }
 
 #msgHolder
