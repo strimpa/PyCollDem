@@ -79,9 +79,13 @@ $ = require(
 
 		var msgID = msg['id'];
 		var msgHolder = ui.div(parent, {renderBorder:true, id:"msgHolder"});
-		var msgDiv = ui.renderMessage(msgHolder, msg);//, depth>0);
+		//var msgDiv = ui.renderMessage(msgHolder, msg);//, depth>0);
 		var answerHolder = ui.div(msgHolder, {renderBorder:false, boxDisplay:true, id:"answerHolder"});
-
+		conn.getMessageHTML(msgID, function(result)
+		{
+			msgHolder.append(result);
+		});
+/*
 		if(depth<max_depth)
 		{
 			renderAnswers(msgID, answerHolder, depth);
@@ -116,7 +120,7 @@ $ = require(
 		evalDiv.each(function(){
 			ui.renderEvaluation($(this), msg, conn);
 		});
-
+*/
 	}
 
 	///////////////////////////////////////////////////////////////////////

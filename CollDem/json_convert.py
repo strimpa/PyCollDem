@@ -1,6 +1,7 @@
 import json
 from json import JSONEncoder
-from CollDem.models import Message, CollDemUser, EvaluationSet
+from CollDem.models import Message, CollDemUser
+from devote.models import EvaluationSet
 from CollDem.controllers import MessageController
 from django.conf.urls.static import static
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,8 +29,7 @@ class CollDemEncoder(JSONEncoder):
 				'avatar':CollDemUser.objects.get_pic(obj.author),
 				'header':obj.header, 
 				'text':obj.text,
-				'is_author':(obj.author == obj.requestUser),
-				'evaluation':controller.getEvaluation(obj.requestUser),
+				'is_author':(obj.author == obj.requestUser)
 			}
 			if hasattr(obj, 'completeDataLength'):
 				returnObject['completeDataLength'] = obj.completeDataLength

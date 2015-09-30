@@ -9,9 +9,11 @@ from django.forms import Textarea
 from django.forms.models import modelformset_factory
 
 from CollDem.forms import LoginForm, EnterMessageForm, AccountForm, ImageForm, ProfileForm, RegisterForm, LoginForm
-from CollDem.models import Message, CollDemUser, SocialNetwork, Evaluation
+from CollDem.models import Message, CollDemUser, SocialNetwork
 from CollDem.controllers import MessageController
 from CollDem.analytics import notification_list
+
+from devote.models import Evaluation, KeywordList
 
 from django.conf import settings
 
@@ -35,8 +37,8 @@ def handleMessageForm(request):
 			keywords = entermsg_form.cleaned_data['keywords']
 			msg = MessageController.createMessage(None, header, text, request, visValue)
 			msgController = MessageController(msg)
-			keyWordArray = keywords.split(',')
-			msgController.setKeywords(keyWordArray)
+			keyWordArray = [x.strip() for x in keywords.split(',')]
+			KeywordList.mgr.setKeywords(msg, keyWordArray)
 
 	return entermsg_form
 

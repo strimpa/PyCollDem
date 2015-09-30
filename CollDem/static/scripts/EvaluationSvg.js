@@ -78,8 +78,8 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 				{
 					if(useUserOffsets==true)
 					{
-						if(keyword in evalObj['activeUserEvaluation'])
-							userOffset = evalObj['activeUserEvaluation'][keyword];
+						if(keyword in evalObj['active_user_evaluation'])
+							userOffset = evalObj['active_user_evaluation'][keyword];
 					}
 					else
 					{
@@ -158,7 +158,7 @@ define(["snap", 'sylvester', 'underscore'], function(snap)
 		updateToolGroup = function(canEvaluate)
 		{
 			var vertices = renderPolygon(neutralRadius, lineGroup, toolLineAttr, true, true);
-			var userEvaluation = evalObj['activeUserEvaluation'];
+			var userEvaluation = evalObj['active_user_evaluation'];
 			for (var i = 0; i < directions.length; i++) {
 				var handleGroup = canvas.group();
 				handleGroup.myDir = directions[i];

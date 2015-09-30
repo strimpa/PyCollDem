@@ -5,17 +5,16 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^facebook/', include('django_facebook.urls')),
-	url(r'^accounts/', include('django_facebook.auth_urls')), #Don't add this line if you use django registration or userena for registration and auth.
+    url(r'^devote/', include('devote.urls')),
 
     #message queries
     url(r'^messages/answers/(?P<answer_to>\w+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/author/(?P<authorid>\d+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/(?P<userid>\d+)$', 'CollDem.messageViews.messages'),
     url(r'^messages/(?P<msgid>\w+)$', 'CollDem.messageViews.messages'),
+    url(r'^message/(?P<msgid>\w+)$', 'CollDem.messageViews.render_msg'),
 
     url(r'^notifications/json/', 'CollDem.analytics.notifications'),
-    url(r'^media/eval/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluation'),
 
     # Main content urls:
     url(r'^admin/$', include(admin.site.urls)),
@@ -34,9 +33,6 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'CollDem.account_views.logout_request'),
     url(r'^answer/$', 'CollDem.messageViews.answer'),
     url(r'^messages/delete/(?P<msgid>\w+)$', 'CollDem.messageViews.delete'),
-   	url(r'^messages/evaluate/(?P<msgid>\w+)$', 'CollDem.messageViews.evaluate'),
-   	url(r'^messages/set_keywords/(?P<msgid>\w+)$', 'CollDem.messageViews.set_keywords'),
-
 )
 
 if settings.DEBUG:

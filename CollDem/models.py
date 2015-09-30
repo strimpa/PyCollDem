@@ -7,8 +7,6 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
-import django_facebook
-
 # Meembership
 
 class SocialNetwork(models.Model):
@@ -82,7 +80,7 @@ class CollDemUserManager(BaseUserManager):
 		return theuser
 
 
-class CollDemUser(AbstractBaseUser, PermissionsMixin, django_facebook.models.BaseFacebookModel):
+class CollDemUser(AbstractBaseUser, PermissionsMixin):
 	guid = models.BigIntegerField("Unique ID", primary_key=True, editable=False)
 	first_name = models.CharField("First name", max_length=256, blank=True)
 	last_name = models.CharField("Second name", max_length=256, blank=True)
@@ -148,41 +146,6 @@ class Message(models.Model):
 	def __unicode__(self):
 		return self.header
 
-class KeywordList(models.Model):
-	for_msg = models.OneToOneField(Message, verbose_name="The message for which these keyworkds are created")
-
-class Keyword(models.Model):
-	name = models.CharField("Keyword", max_length="128", primary_key=True)
-	keywordset = models.ManyToManyField(KeywordList)
-
-class EvaluationSet(models.Model):
-	evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="The user giving the evaluation.", related_name="my_evaluations")
-	target_msg = models.ForeignKey(Message, verbose_name="The evaluated message.", related_name="user_evaluation")
-	comment = models.OneToOneField(Message, verbose_name="The answer message commenting the evaluation.", related_name="commented_evaluation", null=True)
-	updated_at = models.DateTimeField("Created at", auto_now_add=True)
-
-	def __unicode__(self):
-		returnString = "Evaluation\nEvaluator:"+evaluator.username
-		for e in evaluation_set:
-			returnString += "\t"+e.name+":"+str(e.factor)
-		return 
-
-
-class Evaluation(models.Model):
-	"A tuple pair for a user evaluation"
-
-	EVAL_DEFAULT_CHOICES = (
-		('HELPFUL', 'helpful'),
-		('FUNNY', 'funny'),
-		('INSPIRATIONAL', 'inspirational'),
-	)
-
-	name = models.CharField("Descriptor or the evaluation", max_length="64", choices=EVAL_DEFAULT_CHOICES)
-	factor = models.FloatField("The evaluation value")
-	evaluation_set = models.ForeignKey(EvaluationSet)
-
-	def __unicode__(self):
-		return (name+":"+str(factor))
 
 ##########################
 ## overloads

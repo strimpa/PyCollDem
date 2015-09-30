@@ -86,6 +86,17 @@ define(
 		}, func, errorFunc);
 	}
 
+	getMessageHTML = function(msgID, func, errorFunc)
+	{
+		var theurl = "/message/"+msgID;
+		var serverdata = {'msgid':msgID};
+		sendAjax({
+			url:theurl, 
+			data:serverdata,
+			type:'POST'
+		}, func, errorFunc);
+	}
+
 	getAnswerForm = function(formdata, func, errorFunc)
 	{
 		request = {

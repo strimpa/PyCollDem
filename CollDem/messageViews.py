@@ -6,11 +6,13 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Q
-from CollDem.models import CollDemUser, Message, Evaluation, EvaluationSet, KeywordList, Keyword
+from CollDem.models import CollDemUser, Message
 from CollDem.json_convert import CollDemEncoder
 from forms import AnswerForm
 from CollDem.controllers import MessageController
 from django.core.exceptions import ObjectDoesNotExist
+
+from devote.models import Evaluation, EvaluationSet, KeywordList, Keyword
 
 global_loading_step = 8
 answer_loading_step = 3
@@ -91,52 +93,19 @@ def answer(request):
 		}, 
 		context_instance=RequestContext(request))
 
-def evaluation(request, msgid=None):
-	return render(request, 'evaluationImage.svg', {})
 
-def evaluate(request, msgid):
-	# if request.method!='POST':
-	# 	return HttpResponse("BAD EVALUATION REQUEST", content_type='text/plain')
-	msg = Message.objects.get(guid=msgid)
-	msgController = MessageController(msg)
+def render_msg(request, msgid):
+	the_msg = Message.objects.get(guid=msgid)
 
-	if not msgController.mayUserInteract(request.user):
-		data = json.dumps(msgController.getEvaluation())
-		return HttpResponse(data, content_type='application/json')
+	devote_obj = EvaluationSet.mgr.getEvaluation(msgid, request.user)
+	devote_obj['can_evaluate'] = request.user.is_authenticated() and the_msg.author != request.user
+	devote_obj['is_author'] = request.user.is_authenticated() and the_msg.author == request.user
 
-	try:
-		evalSet = EvaluationSet.objects.get(evaluator=request.user, target_msg=msg)
-	except ObjectDoesNotExist:
-		evalSet = EvaluationSet.objects.create(evaluator=request.user, target_msg=msg)
-
-	for postVarKey,postVarVal in request.POST.items():
-		evaluation = None
-		try:
-			evaluation = evalSet.evaluation_set.get(name=postVarKey)
-			evaluation.factor = float(postVarVal)
-			evaluation.save()
-		except ObjectDoesNotExist:
-			evaluation = Evaluation.objects.create(name=postVarKey, factor=float(postVarVal), evaluation_set=evalSet)
-	evalSet.updated_at = timezone.now()
-	evalSet.save()
-
-	data = json.dumps(msgController.getEvaluation(request.user))
-
-	return HttpResponse(data, content_type='application/json')
-
-def set_keywords(request, msgid):
-	msg = Message.objects.get(guid=msgid)
-	msgController = MessageController(msg)
-
-	if not msgController.mayUserInteract(request.user):
-		data = json.dumps(msgController.getEvaluation())
-		return HttpResponse(data, content_type='application/json')
-
-	success = msgController.setKeywords([postVarKey for postVarKey,postVarVal in request.POST.items()])
-	if not success:
-		return HttpResponse("Message has no keyword set!", content_type='text/plain');
-
-	msg.requestUser = request.user
-	data = json.dumps(msg, cls=CollDemEncoder)
-
-	return HttpResponse(data, content_type='application/json')
+	return render(request, 'message.html', {
+		'msg':the_msg,
+		'is_anonymous': the_msg.author == None,
+		'user_is_author': (the_msg.author == request.user),
+		'avatar': CollDemUser.objects.get_pic(the_msg.author),
+		'eval_url':"devote/render_eval/"+the_msg.guid,
+		'devote_data':devote_obj
+		})
